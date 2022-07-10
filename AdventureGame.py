@@ -4,17 +4,33 @@ from os import name
 import os
 from random import random
 from random import seed
+from enum import Enum, auto
 
 def remfront(st):
     remain = st[1:]
     return remain
 
-from enum import Enum, auto 
+# - Inventory Item Enum
+# 
+#   used to differentiate inventory item type
+#
+#   - used in State.in
+#  
+#  
 class InvItem(Enum):
     HEALTH_POTION = auto()
     POWER_UP = auto()
 
-from enum import Enum, auto
+# - Scenes Enum
+# 
+#   used to differentiate scene functions 
+#   
+#   - used in State.SceneMap as Scenes.BEGINNING: Beginning
+#   - Beginning as used above refers to def Beginning(state): <- scene function
+#   - def Beginning(state): is run in State.play as:
+#       self.current_scene, self.scene_hold = self.sceneMap[self.current_scene](self)
+#       - self.sceneMap[self.current_scene](self) == def Beginning(state):
+# 
 class Scenes(Enum):
     MENU = 'menu'
     INVENTORY = 'inv'
@@ -98,7 +114,67 @@ class Scenes(Enum):
     # - boss area 
     BOSS_AREA = 'bossArea' # -> M_LVL3_STAIRS
 
-
+# - State Class
+# 
+#   used to manage gamestate variables and functions
+# 
+#   - passed to scene functions for state changes
+#   
+#   - used in main() as:
+#       state = State()
+#       state.play()
+# 
+#   - methods:
+#       play()
+#       - game loop
+#       - checks if self.current_scene is Scenes.INVENTORY or Scenes.MENU and 
+#       runs State.use_inventory or State.use_menu respectively
+#       - else the current scene function is run by:
+#           self.current_scene, self.scene_hold = self.sceneMap[self.current_scene](self)
+#      
+#       use_menu()
+#       - runs menu
+#       - prints menu options
+#       - in loop response is checked and run until continue or exit are selected
+#       - if save or load are selected state variables are serialized or deserialized
+#   
+#       use_inventory()
+#       - runs inventory
+#       - prints inventory and asks which the user would like to use
+#       - in loop response is checked and run until exit is selected
+#       - if 1 (health potion) is selected 10 hp is added to self.hp 
+#       - if 2 (power up) is selected 2 is added to self.hit_rate
+# 
+#       hp_dec(amt)
+#       - decrements self.hp by amt 
+#       
+#       encounter(encounter_map, probOfAttack)
+#       - runs enemy encounter
+#       - checks if probability of encounter is 1 (100%)
+#       - if not, generates random number 0-1 (num) and checks if num is less than probOfAttack  
+#       - if so the function returns true, else the function is continued
+#       - intro text for encounter is printed and encounter variables are instantiated
+#       - coin if flipped to determine who has first move
+#       - in loop check if you_turn is true or false and runs player or npc portions
+# 
+#       - player portion asks if player would like to ATTACK, take a HEALTH potion or a POWER up
+#       - if response is HEALTH or POWER self.use_health_potion() or self.use_power_up()
+#       - if ATTACK then a "die" is rolled for attack 
+#       - if roll is higher than npcs defense then self.hit_rate is decremented from npcs hp
+#  
+#       - npc portion rolls for attack and if roll is higher than self.defense, self.hp is  
+#       decremented by npcs hit rate
+# 
+#       - at the end of each loop self.ph and npcs hp are checked and if either are dead a message is 
+#       printed and function returns True (player wins) or False (player dies)
+# 
+#       hp_dec(amt)
+#       - decrements self.hp by amt
+# 
+#       change_scene(scene)
+#       - changes self.current_scene to scene
+# 
+# 
 class State:
     def __init__(self):
         self.play_bool = False
@@ -231,6 +307,11 @@ class State:
             else:
                 print("Not a valid response")
 
+    def level_up(self, hp, defence, attack):
+        self.hp = hp
+        self.defence = defence
+        self.attack = attack
+
     def use_inventory(self):
         self.current_scene = self.scene_hold
         print(self.inventory)
@@ -261,6 +342,7 @@ class State:
 
     def hp_dec(self,amt):
         self.hp -= amt
+
 
     def encounter(self, encounterMap, probOfAttack):
         if probOfAttack != 1:
@@ -355,6 +437,37 @@ class State:
         self.current_scene = scene
 
 
+#   - Inventory Class
+# 
+#   used to manage inventory
+#   
+#   - propery of State Class as:
+#       self.inventory = Inventory()
+#   - used in State.use_inventory() as 
+#       self.inventory.health_check and self.inventory.power_check
+#   
+#   - methods:  
+#       set_health(amt)
+#       - sets self.hp to amt
+#       set_powerup(amt)
+#       - sets self.power_up to amt
+#       health_check()
+#       - checks if the number of health potions is > 0
+#       power_check()
+#       - checks if the number of power ups is > 0
+#       health_potion_amt()
+#       - returns number of health potions
+#       power_up_amt()
+#       - returns number of power ups
+#       add_health_potion()
+#       - increment self.health_potion by 1
+#       use_health_potion()
+#       - decrements self.health_potion by 1
+#       add_power_up()
+#       - increment self.power_up by 1
+#       use_power_up()
+#       _increment self.power_up by 1
+# 
 class Inventory:
     def __init__(self):
         self.health_potion = 0
@@ -398,17 +511,14 @@ class Inventory:
     def use_power_up(self):
         self.power_up -= 1
 
-# class Player:
-#     def __init__(self) -> None:
-#         self.hp = 50
-
-#     def __str__(self) -> str:
-#         return f'hp: {self.hp}'
-
-#     def hp_down(self):
-#         self.hp -= 1 
-
-
+#############
+# 
+#   get_input(current_scene, scene_map, words)
+#   - gets respone from player and returns appropriate Scene Enums
+#   - if response is INV returns Scenes.INVENTORY and current scene
+#   - if response is MENU returns Scenes.MENU and current scene
+#   - else 
+# 
 def get_input(current_scene, scene_map, words):
     p = True
     out = scene_map
