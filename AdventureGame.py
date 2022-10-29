@@ -1195,7 +1195,7 @@ def forestCaveEntranceIn(state):
     return get_input(
         state.current_scene,
         {
-            'JUMP': Scenes.POND_CAVE_16,
+            'JUMP': Scenes.POND_CAVE_20,
             'BACK': Scenes.FOREST_CAVE_CLEARING_OUT
         },
         "JUMP, BACK"
@@ -1215,7 +1215,7 @@ def forestCaveEntranceOut(state):
     return get_input(
         state.current_scene,
         {
-            'JUMP': Scenes.POND_CAVE_16,
+            'JUMP': Scenes.POND_CAVE_20,
             'HOLE': Scenes.FOREST_CAVE_CLEARING_OUT
         },
         "JUMP, HOLE"
