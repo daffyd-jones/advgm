@@ -345,7 +345,7 @@ class State:
         self.hp -= amt
 
 
-    def encounter(self, encounterMap, probOfAttack):
+    def encounter(self, probOfAttack, encounterMap):
         if probOfAttack != 1:
             num = random()
             if num < probOfAttack:
