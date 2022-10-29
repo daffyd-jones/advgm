@@ -253,6 +253,7 @@ class State:
 
     def play(self):
         self.play_bool = True
+        os.system('cls' if os.name == 'nt' else 'clear')
         while self.play_bool:     
             if self.current_scene == Scenes.INVENTORY:
                 self.use_inventory()
@@ -1082,9 +1083,16 @@ def ceremonyOfLight(state):
     hld = str(input(""))
     print("The crowds cheering grew as the woman reached the small stage and took a seat on the intricately carved chair next to Gladion's.")
     print("'Welcome my love, my other half, two as one as whole is one!'")
-    print("The crowd chanted sfter Gladion, 'Two as one whole as one!'")
+    print("The crowd chanted after Gladion, 'Two as one whole as one!'")
     print("The woman raised her hand and waved at the crowd calmly, a serene smile on her face.")
-    print("Gladion chuckled lightly and waved at the small village to quiet, ")
+    print("Gladion chuckled lightly and waved at the small village to quiet.")
+    hld = str(input(""))
+    print("'Here again after another seasonal cycle. It is so good to see you all again.' He stood with his hands held held wide above his head.")
+    print("''")
+    print("")
+    print("")
+    print("")
+    hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return Scenes.COL_ENCOUNTER, Scenes.COL_ENCOUNTER
 
