@@ -4,6 +4,7 @@ from os import name
 import os
 from random import random
 from random import seed
+import math
 from enum import Enum, auto
 
 def remfront(st):
@@ -86,6 +87,29 @@ class Scenes(Enum):
     BACKWOODS = 'backwoods' # -> ENTER_FOREST, FOREST_CAVE_CLEARING_IN, FOREST_PUZZLE
     # - some kind of puzzle thing
     FOREST_PUZZLE = 'forestPuzzle' # -> BACKWOODS, FOREST_MOUNTAIN_PATH
+
+    FOREST_PUZZLE_CENTER = 'puzzleCenter'
+
+    FOREST_PUZZLE_ONE = 'forestPuzzleOne'
+    FOREST_PUZZLE_TWO = 'forestPuzzleTwo'
+    FOREST_PUZZLE_THREE = 'forestPuzzleThree'
+    FOREST_PUZZLE_FOUR = 'forestPuzzleFour'
+    FOREST_PUZZLE_FIVE = 'forestPuzzleFifth'
+    FOREST_PUZZLE_SIX = 'forestPuzzleSixth'
+    FOREST_PUZZLE_SEVEN = 'forestPuzzleSeventh'
+    FOREST_PUZZLE_EIGHT = 'forestPuzzleEighth'
+
+    PUZZLE_ONE_TRIGGER = 'puzzleTriggerOne'
+    PUZZLE_TWO_TRIGGER = 'puzzleTriggerTwo'
+    PUZZLE_THREE_TRIGGER = 'puzzleTriggerThree'
+    PUZZLE_FOUR_TRIGGER = 'puzzleTriggerFour'
+    PUZZLE_FIVE_TRIGGER = 'puzzleTriggerFive'
+    PUZZLE_SIX_TRIGGER = 'puzzleTriggerSix'
+    PUZZLE_SEVEN_TRIGGER = 'puzzleTriggerSeven'
+    PUZZLE_EIGHT_TRIGGER = 'puzzleTriggerEight'
+
+
+
     FOREST_MOUTAIN_PATH = 'forestMountainPath' # -> FOREST_PUZZLE, MOUNTAIN_BASE
     # - forest pond cave entrance
     FOREST_CAVE_CLEARING_IN = 'forestCaveClearingIn' # -> BACKWOODS, FOREST_CAVE_ENTRANCE_IN
@@ -189,6 +213,11 @@ class State:
             InvItem.HEALTH_POTION: self.inventory.add_health_potion(), 
             InvItem.POWER_UP: self.inventory.add_power_up()
         }
+        self.init_puzzle = True
+        self.reset_puzzle = True
+        self.puzzle_string = ""
+        self.puzzle_triggered = [False, False, False, False, False, False, False, False] 
+        self.puzzle_sections = ["1", "2", "3", "4", "5", "6", "7", "8"]
         self.sceneMap = {
             Scenes.BEGINNING: Beginning,
             Scenes.ENTER_FOREST: enterForest,
@@ -206,6 +235,23 @@ class State:
             Scenes.COL_ENCOUNTER: COLEncounter,
             Scenes.BACKWOODS: backwoods,
             Scenes.FOREST_PUZZLE: forestPuzzle,
+            Scenes.FOREST_PUZZLE_CENTER: forestPuzzleCenter,
+            Scenes.FOREST_PUZZLE_ONE: forestPuzzleOne,
+            Scenes.FOREST_PUZZLE_TWO: forestPuzzleTwo,
+            Scenes.FOREST_PUZZLE_THREE: forestPuzzleThree,
+            Scenes.FOREST_PUZZLE_FOUR: forestPuzzleFour,
+            Scenes.FOREST_PUZZLE_FIVE: forestPuzzleFive,
+            Scenes.FOREST_PUZZLE_SIX: forestPuzzleSix,
+            Scenes.FOREST_PUZZLE_SEVEN: forestPuzzleSeven,
+            Scenes.FOREST_PUZZLE_EIGHT: forestPuzzleEight,
+            Scenes.PUZZLE_ONE_TRIGGER: puzzleTriggerOne,
+            Scenes.PUZZLE_TWO_TRIGGER: puzzleTriggerTwo,
+            Scenes.PUZZLE_THREE_TRIGGER: puzzleTriggerThree,
+            Scenes.PUZZLE_FOUR_TRIGGER: puzzleTriggerFour,
+            Scenes.PUZZLE_FIVE_TRIGGER: puzzleTriggerFive,
+            Scenes.PUZZLE_SIX_TRIGGER: puzzleTriggerSix,
+            Scenes.PUZZLE_SEVEN_TRIGGER: puzzleTriggerSeven,
+            Scenes.PUZZLE_EIGHT_TRIGGER: puzzleTriggerEight,
             Scenes.FOREST_MOUTAIN_PATH: forestMountainPath,
             Scenes.FOREST_CAVE_ENTRANCE_IN: forestCaveEntranceIn,
             Scenes.FOREST_CAVE_ENTRANCE_OUT: forestCaveEntranceOut,
@@ -437,6 +483,41 @@ class State:
     def change_scene(self, scene):
         self.current_scene = scene
 
+    def reset_board(self):
+        for i in range(0,1):    
+            temp_sections = self.puzzle_sections
+            for i in range(len(temp_sections)):
+                temp_rand = math.floor((random() * len(temp_sections) - 1))
+                self.puzzle_string = f'{self.puzzle_string}{temp_sections[temp_rand]}'
+                del temp_sections[temp_rand]
+            if i == 0:
+                self.puzzle_string = f'{self.puzzle_string}|'
+
+    def puzzle_is_valid(self):
+        triggered = self.puzzle_triggered.count(True)
+        for i in range(0, triggered):
+            if not self.puzzle_triggered[self.puzzle_string[self.puzzle_string[i] + 9]]:
+                return False
+        return True
+    
+    def puzzle_complete(self):
+        return self.puzzle_triggered.count(True) == 8
+        
+    def section_number(self, section):
+        parts = self.puzzle_string.split("|")
+        return parts[1][int(parts[0][section])]
+
+    def get_new_puzzle(self):
+        return self.reset_puzzle
+
+    def init_puzzle_true(self):
+        self.init_puzzle = True
+
+    def init_puzzle_false(self):
+        self.init_puzzle = False
+
+    def is_init_puzzle(self):
+        return self.init_puzzle 
 
 #   - Inventory Class
 # 
@@ -543,11 +624,15 @@ def get_input(current_scene, scene_map, words):
 
 
 def Beginning(state):
-    print("You awake feeling groggy and sore. Opening your eyes, you look around. You appear to be in a clearing surrounded by tall evergreens. Twenty yards to your right is a small pond, still and surrounded by small ferns. Behind you, and beyond the forest towers a mountain, cold and grey against the bright sky. It cast the forest and the clearing below in shadow.")
-    print("What do you want to do?")
-    print("Walk towards MOUNTAIN")
-    print("Explore FOREST")
-    print("Look at POND")
+    print_msg = """You awake feeling groggy and sore. Opening your eyes,
+you look around. You appear to be in a clearing surrounded by tall
+evergreens. Twenty yards to your right is a small pond, still and
+surrounded by small ferns. Behind you, and beyond the forest towers a
+mountain, cold and grey against the bright sky. It cast the forest and the
+clearing below in shadow."""
+    choice_msg = """What do you want to do?\nWalk towards MOUNTAIN\nExplore FOREST\nLook at POND"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -561,11 +646,10 @@ def Beginning(state):
 
 
 def Beginning2(state):
-    print("You stand in the center of the clearing that you awoke in")
-    print("What do you want to do?")
-    print("Walk towards MOUNTAIN")
-    print("Explore FOREST")
-    print("Look at POND")
+    print_msg = """You stand in the center of the clearing that you awoke in"""
+    choice_msg = """What do you want to do?\nWalk towards MOUNTAIN\nExplore FOREST\nLook at POND"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -578,13 +662,13 @@ def Beginning2(state):
     )
 
 def PondApproach(state):
-    print("As you approach the pond you see a ripple of movement disturb the smooth surface.")
-    print("Once on the bank you see something shimmering at the bottom, nothing now stirrs in the clear water")
-    print("You look around you. You see a rock to your left.")
-    print("What would yo like to do?")
-    print("THROW rock into pond")
-    print("JUMP into pond")
-    print("RETURN to center of the clearing")
+    print_msg = """As you approach the pond you see a ripple of movement disturb
+the smooth surface. Once on the bank you see something shimmering at the
+bottom, nothing now stirrs in the clear water. You look around you. You see
+a rock to your left."""
+    choice_msg = """What would yo like to do?\nTHROW rock into pond\nJUMP into pond\nRETURN to center of the clearing"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -597,14 +681,13 @@ def PondApproach(state):
     )
 
 def Throwrock(state):
-    print("You stoop to pick up the rock and raise it above your head.")
-    print("You throw the rock with into the center of the pond with substantial force. It bursts through the water with a loud splunk sound.")
-    print("You wait for a moment.")
-    print("Nothing happens.")
-    print("")
-    print("What now?")
-    print("JUMP in pool")
-    print("RETURN to clearing")
+    print_msg = """You stoop to pick up the rock and raise it above your head. You
+throw the rock with into the center of the pond with substantial force. It
+bursts through the water with a loud splunk sound.\nYou wait for a moment.
+Nothing happens."""
+    choice_msg = """What now?\nJUMP in pool\nRETURN to clearing"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -616,13 +699,14 @@ def Throwrock(state):
     )
 
 def pondJump(state):
-    print("You ready yourself for a moment befor leaping with a heave towards the center of the pond.")
-    print("The world crashes around you as you plunge into the water. Once you regain your bearings you look around you.")
-    print("Below you see the glint of something shimmering, to your right a bit you see a small opening to a cave.")
-    print("What do you want to do?")
-    print("Swim DOWN")
-    print("Swim towards CAVE")
-    print("Get OUT")
+    print_msg = """You ready yourself for a moment befor leaping with a
+heave towards the center of the pond. The world crashes around you as you
+plunge into the water. Once you regain your bearings you look around you.
+Below you see the glint of something shimmering, to your right a bit you
+see a small opening to a cave. """
+    choice_msg = """What do you want to do?\nSwim DOWN\nSwim towards CAVE\nGet OUT"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -635,11 +719,11 @@ def pondJump(state):
     )
 
 def pondOut(state):
-    print("You heave yourself out of the pond and stand on the bank dripping with water.")
-    print("The pond sits before you once again still.")
-    print("What do you want to do?")
-    print("JUMP back into the pond")
-    print("RETURN to the center of the clearing")
+    print_msg = """You heave yourself out of the pond and stand on the bank dripping
+with water.\nThe pond sits before you once again still."""
+    choice_msg = """What do you want to do?\nJUMP back into the pond\nRETURN to the center of the clearing"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -651,12 +735,11 @@ def pondOut(state):
     )
 
 def pondDown(state):
-    print("As you swim downards, the glint persists and becomes clearer.")
-    print("As you push aside a large pond fern you see a silver pendant lodged in the dirt")
-    print("The pendant seems to emit a light blue glow")
-    print("Do you grab the pendant or turn back?")
-    print("GRAB the pendant")
-    print("Turn BACK")
+    print_msg = """As you swim downards, the glint persists and becomes clearer. As you
+push aside a large pond fern you see a silver pendant lodged in the dirt.\nThe pendant seems to emit a light blue glow."""
+    choice_msg = """Do you grab the pendant or turn back?\nGRAB the pendant\nTurn BACK"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -668,12 +751,11 @@ def pondDown(state):
     )
 
 def pondBack(state):
-    print("You float just below the ponds surface. Below you you see a glint of silver.")
-    print("To your right you see a small cave opening")
-    print("What do yo want to do?")
-    print("Swim DOWN")
-    print("Check out CAVE")
-    print("Get OUT")
+    print_msg = """You float just below the ponds surface. Below you you see
+a glint of silver. To your right you see a small cave opening."""
+    choice_msg = """What do yo want to do?\nSwim DOWN\nCheck out CAVE\nGet OUT"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -687,21 +769,30 @@ def pondBack(state):
     
 
 def grabPendant(state):
-    print("You reach out for the pendant, the pressure in the water around you seems to raise as you do so.")
-    print("As your hand closes around the pendant, you hear a harsh squeaky voice behind you")
-    print("'Hey you bitch! get the fuck away from my pendant!'")
-    print("You look around you, behind you is a small creature with blue and pink scales, large eyes and large teeth")
-    print("You try not to exhale in panic, frantically you make you best effort to hold your breath")
-    print("'Good job! Most people just drown', said the beast with a smug grin, its voice sounded like a muffled gurgle through the water")
-    print("You look around you, you notice suddenly that the ground around you is covered in skeletons and half decomposed bodies")
-    print("'I like you, Ill tell you what, Ill give you the pendant if you grab me something. Deep in the forest there is a berry that I am partial to'")
-    print("'Id get it myself of course, but I cant leave this pond. Get me five of those berries and Ill give you this pendant'")
-    print("You feel your lungs screaming for air, you nod your head vigorously as you rocket towards the surface desperately")
-    print("The creature waves at you as you go, 'See you later maybe!'")
+    print_msg = """You reach out for the pendant, the pressure in the water around
+you seems to raise as you do so. As your hand closes around the pendant,
+you hear a harsh squeaky voice behind you. 'Hey you bitch! get the fuck
+away from my pendant!'. You look around you, behind you is a small creature
+with blue and pink scales, large eyes and large teeth. You try not to
+exhale in panic, frantically you make you best effort to hold your breath.
+'Good job! Most people just drown', said the beast with a smug grin, its
+voice sounded like a muffled gurgle through the water. You look around
+you, you notice suddenly that the ground around you is covered in skeletons
+and half decomposed bodies. 'I like you, Ill tell you what, Ill give you
+the pendant if you grab me something. Deep in the forest there is a berry
+that I am partial to'. 'Id get it myself of course, but I cant leave this
+pond. Get me five of those berries and Ill give you this pendant'. You feel
+your lungs screaming for air, you nod your head vigorously as you rocket
+towards the surface desperately. The creature waves at you as you go, 'See
+you later maybe!'."""
+    print(print_msg)
     return Scenes.POND_OUT
 
 def pondCave1(state):
-    print("pond cave 1")
+    print_msg = """pond cave 1"""
+    choice_msg = """2"""
+    print(print_msg)
+    print(choice_msg)
     print("enter any key to see options")
     print(f"| {state} |")
     return get_input(
@@ -713,7 +804,10 @@ def pondCave1(state):
     )
 
 def pondCave2(state):
-    print("pond cave 2")
+    print_msg = """pond cave 2"""
+    choice_msg = """1\n3\n7"""
+    print(print_msg)
+    print(choice_msg)
     print("enter any key to see options")
     print(f"| {state} |")
     return get_input(
@@ -728,20 +822,20 @@ def pondCave2(state):
     )
 
 def pondCave3(state):
-    print("You swim from the main area of the pond into the cave")
-    print("As you enter the cave, the water around you becomes colder")
-    print("Polyps grow on the walls and seem to reach out towards you.")
-    print("The walls move away from you as you enter a larger underwater room, three passages lead out of the room presumaby into other caverns")
-    print("You notice an air pocket at the top of the chamber.")
-    print("In desparation you swim towards the surface.")
-    print("you burst through the surface and smack your head on the low ceiling*")
-    print("There is a space of about a foot between the water and the roof of the cave.")
-    print("You look up at the rock above you in annoyance, with surprise you notice a circle scratched harshly into it")
-    print("The mark looks far from natural, and looks more like a zero sratched in by another being.")
-    print("What would you like to do?")
-    print("BACK")
-    print("2")
-    print("4")
+    print_msg = """You swim from the main area of the pond into the cave.
+As you enter the cave, the water around you becomes colder. Polyps grow on
+the walls and seem to reach out towards you. The walls move away from you
+as you enter a larger underwater room, three passages lead out of the room
+presumaby into other caverns. You notice an air pocket at the top of the
+chamber. In desparation you swim towards the surface. You burst through the
+surface and smack your head on the low ceiling. There is a space of about a
+foot between the water and the roof of the cave. You look up at the rock
+above you in annoyance, with surprise you notice a circle scratched harshly
+into it. The mark looks far from natural, and looks more like a zero
+sratched in by another being."""
+    choice_msg = """What would you like to do?\nBACK\n2\n4"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -754,8 +848,10 @@ def pondCave3(state):
     )
 
 def pondCave4(state):
-    print("pond cave 4")
-    print("enter any key to see options")
+    print_msg = """pond cave 4"""
+    choice_msg = """3\n5\n9"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -768,8 +864,10 @@ def pondCave4(state):
     )
 
 def pondCave5(state):
-    print("pond cave 5")
-    print("enter any key to see options")
+    print_msg = """pond cave 5"""
+    choice_msg = """4"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -781,8 +879,10 @@ def pondCave5(state):
     )
 
 def pondCave6(state):
-    print("pond cave 6")
-    print("enter any key to see options")
+    print_msg = """pond cave 6"""
+    choice_msg = """7\n11"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -794,8 +894,10 @@ def pondCave6(state):
     )
 
 def pondCave7(state):
-    print("pond cave 7")
-    print("enter any key to see options")
+    print_msg = """pond cave 7"""
+    choice_msg = """2\n6\n8"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -808,8 +910,10 @@ def pondCave7(state):
     )
 
 def pondCave8(state):
-    print("pond cave 8")
-    print("enter any key to see options")
+    print_msg = """pond cave 8"""
+    choice_msg = """7\n13"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -821,8 +925,10 @@ def pondCave8(state):
     )
 
 def pondCave9(state):
-    print("pond cave 9")
-    print("enter any key to see options")
+    print_msg = """pond cave 9"""
+    choice_msg = """4\n10"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -834,8 +940,10 @@ def pondCave9(state):
     )
 
 def pondCave10(state):
-    print("pond cave 10")
-    print("enter any key to see options")
+    print_msg = """pond cave 10"""
+    choice_msg = """9\n15"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -847,8 +955,10 @@ def pondCave10(state):
     )
 
 def pondCave11(state):
-    print("pond cave 11")
-    print("enter any key to see options")
+    print_msg = """pond cave 11"""
+    choice_msg = """6"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -859,8 +969,10 @@ def pondCave11(state):
     )
 
 def pondCave12(state):
-    print("pond cave 12")
-    print("enter any key to see options")
+    print_msg = """pond cave 12"""
+    choice_msg = """13\n17"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -872,8 +984,10 @@ def pondCave12(state):
     )
 
 def pondCave13(state):
-    print("pond cave 13")
-    print("enter any key to see options")
+    print_msg = """pond cave 13"""
+    choice_msg = """8\n12\n14"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -886,8 +1000,10 @@ def pondCave13(state):
     )
 
 def pondCave14(state):
-    print("pond cave 14")
-    print("enter any key to see options")
+    print_msg = """pond cave 14"""
+    choice_msg = """enter any key to see options"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -900,8 +1016,10 @@ def pondCave14(state):
     )
 
 def pondCave15(state):
-    print("pond cave 15")
-    print("enter any key to see options")
+    print_msg = """pond cave 15"""
+    choice_msg = """10\n14"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -913,8 +1031,10 @@ def pondCave15(state):
     )
 
 def pondCave16(state):
-    print("pond cave 16")
-    print("enter any key to see options")
+    print_msg = """pond cave 16"""
+    choice_msg = """ENTERANCE\n17"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -926,8 +1046,10 @@ def pondCave16(state):
     )
 
 def pondCave17(state):
-    print("pond cave 17")
-    print("enter any key to see options")
+    print_msg = """pond cave 17"""
+    choice_msg = """12\n16\n18"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -940,8 +1062,10 @@ def pondCave17(state):
     )
 
 def pondCave18(state):
-    print("pond cave 18")
-    print("enter any key to see options")
+    print_msg = """pond cave 18"""
+    choice_msg = """17"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -953,8 +1077,10 @@ def pondCave18(state):
     )
 
 def pondCave19(state):
-    print("pond cave 19")
-    print("enter any key to see options")
+    print_msg = """pond cave 19"""
+    choice_msg = """14\n20"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -966,8 +1092,10 @@ def pondCave19(state):
     )
 
 def pondCave20(state):
-    print("pond cave 20")
-    print("enter any key to see options")
+    print_msg = """pond cave 20"""
+    choice_msg = """ENTERANCE\n19"""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -980,15 +1108,16 @@ def pondCave20(state):
     )
 
 def enterForest(state):
-    print("You leave the open clearing and enter the dense forest")
-    print("The treetops block out the sun and the air becomes noticably cooler")
-    print("You wander a bit, keeping the glow of the clearing within eyesight behind you")
-    print("You notice a couple plants that might be edible, but you decide not to risk it")
-    print("A ways in fron of you, you notice a path worn lightly into the grass by regular use")
-    print("Behind you, the glow of the clearing was diminishing, barely in view")
-    print("What would you like to do?")
-    print("RETURN to the clearing")
-    print("Walk towards the PATH")
+    print_msg = """You leave the open clearing and enter the dense forest.
+The treetops block out the sun and the air becomes noticably cooler. You
+wander a bit, keeping the glow of the clearing within eyesight behind you.
+You notice a couple plants that might be edible, but you decide not to
+risk it. A ways in fron of you, you notice a path worn lightly into the
+grass by regular use. Behind you, the glow of the clearing was diminishing,
+barely in view. """
+    choice_msg = """What would you like to do?\nRETURN to the clearing.\nWalk towards the PATH."""
+    print(print_msg)
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -1000,67 +1129,105 @@ def enterForest(state):
     )
 
 def forPath(state):
-    print("Leaving the clearing behind, you walk towards the path and follow it")
-    print("deeper into the forest. The forest grows more and more dense, blocking out the sun.")
-    print("As the forest around you becomes darker, you notice a dull glow at the far end of the path.")
-    print("The glow slowly becomes brighter as you walk towards it. Continuing down the path, you become increasingly aware of movement in the dark off to either side.")
-    print("The hair on your neck stands on end as you realise that you are surrounded by beings in the dark.")
-    print("They begin to chatter amonst themselves, first as a murmer barely audible, but growing steadily.")
+    print_msg = """Leaving the clearing behind, you walk towards the path
+and follow it deeper into the forest. The forest grows more and more dense,
+blocking out the sun. As the forest around you becomes darker, you notice a
+dull glow at the far end of the path. The glow slowly becomes brighter as
+you walk towards it. Continuing down the path, you become increasingly
+aware of movement in the dark off to either side. The hair on your neck
+stands on end as you realise that you are surrounded by beings in the dark.
+They begin to chatter amonst themselves, first as a murmer barely audible,
+but growing steadily."""
+    print(print_msg)
     hld = str(input(""))
-    print("The chatter quiets as you approach the end of the path. The trees on either side end abruptly and you find yourself in another clearing.")
-    print("In the center of the clearing is a small village that seems to emenate** a dull diffused glow, as if it was comming from the ground and the very wood of the houses.")
-    print("As you stand trepidously/trepidatiously on the edge of the clearing, you notice a figure glide towards you. His head is adorned with branches and from these were hung leaves and berries.")
-    print("His arms stretch outward in welcome as he approached you. 'Welcome you our village traveller, may the forests glowing light bless your journeyed soul'")
-    print("'Your arrival is most oppourtune, we are celebrating the light cycle this evening. You will be our honoured guest'")
-    print("'My name is Gladion. If you wish please follow me and I will see that you are fed and washed, you stink of the world beyond the forest and must be cleansed'")
+    print_msg1 = """The chatter quiets as you approach the end of the path.
+The trees on either side end abruptly and you find yourself in another
+clearing. In the center of the clearing is a small village that seems to
+emenate** a dull diffused glow, as if it was comming from the ground and
+the very wood of the houses. As you stand trepidously/trepidatiously on the
+edge of the clearing, you notice a figure glide towards you. His head is
+adorned with branches and from these were hung leaves and berries. His arms
+stretch outward in welcome as he approached you. 'Welcome you our village
+traveller, may the forests glowing light bless your journeyed soul'. 'Your
+arrival is most oppourtune, we are celebrating the light cycle this
+evening. You will be our honoured guest'. 'My name is Gladion. If you wish
+please follow me and I will see that you are fed and washed, you stink of
+the world beyond the forest and must be cleansed'."""
+    print(print_msg1)
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return Scenes.LIGHT_VILLAGE, Scenes.LIGHT_VILLAGE
 
 def lightVillage(state):
-    print("Hesitantly you walk into the clearing and follow Gladion towards the center of the village")
-    print("Others join you and trail behind, watching you curiously.")
-    print("'Go, be cleansed of outside impurities, I will see you when you are ready for tonights festivities.'")
-    print("Somewhat statrlinglly, four of the villagers appear by your side.")
-    print("They guide you to one of the houses, next to ths house you see a garden with various fruits and vegetables.")
-    print("They seem to be organized in a series of concentric rings, rather than that rows to which you are familiar")
-    print("Amongst the garden around the middle are a number of shrubs with large red berries.")
+    print_msg = """Hesitantly you walk into the clearing and follow Gladion
+towards the center of the village. Others join you and trail behind, 
+watching you curiously. 'Go, be cleansed of outside impurities, I will see
+you when you are ready for tonights festivities'. Somewhat statrlinglly,
+four of the villagers appear by your side. They guide you to one of the
+houses, next to ths house you see a garden with various fruits and
+vegetables. They seem to be organized in a series of concentric rings,
+rather than that rows to which you are familiar. Amongst the garden around
+the middle are a number of shrubs with large red berries."""
+    print(print_msg)
     hld = str(input(""))
-    print("Inside the hut is a low wide metal basin of warm water and some boxes of nice smelling powders")
-    print("Climbing into the basin, you feel the warm water wash away your stress and the grime that had built up on your skin.")
-    print("It occurs to you that this is the first time since you awoke in the clearing that you have had a moment of pause.")
-    print("Why are you here? How did you get here? In a panic it dawned on you, this might be it. You might be stuck here for good.")
+    print_msg1 = """Inside the hut is a low wide metal basin of warm water
+and some boxes of nice smelling powders. Climbing into the basin, you feel
+the warm water wash away your stress and the grime that had built up on
+your skin. It occurs to you that this is the first time since you awoke in
+the clearing that you have had a moment of pause. Why are you here? How did
+you get here? In a panic it dawned on you, this might be it. You might be
+stuck here for good."""
+    print(print_msg1)
     hld = str(input(""))
-    print("As you bask in the water with your eyes closed, you hear some movement behind you. Clumsily in the water, you turn to see whos there.")
-    print("One of the villagers is watching you from accross the room, a curious look on their face.")
-    print("After a moment of eye contact they smile kindly and speak.")
-    print("'Do you not wish to use our cleansing powders?' They gesture to the boxes of powder next to the basin.")
-    print("You realize that you hadnt thought of using the powders, or at least had been intimidated in your ingnorance of their purpose.")
+    print_msg2 = """As you bask in the water with your eyes closed, you hear
+some movement behind you. Clumsily in the water, you turn to see whos
+there. One of the villagers is watching you from accross the room, a
+curious look on their face. After a moment of eye contact they smile kindly
+and speak. 'Do you not wish to use our cleansing powders?' They gesture to
+the boxes of powder next to the basin. You realize that you hadnt thought
+of using the powders, or at least had been intimidated in your ingnorance 
+of their purpose."""
+    print(print_msg2)
     hld = str(input(""))
-    print("You give them a sheepish grimmace, attempting to hide your nude body in the shallow basin.")
-    print("'I wasnt sure how to use them, or what they were and didnt want to risk it.'")
-    print("They smile as they walk to the boxes and pull out a ladle, stooping they scoop some of the powder out of one of the boxes and walk toward you.")
-    print("In a wide arc they toss the powder into the basin and it immediately begins to fizz and foam")
-    print("'Now rub the foam on your skin, it will wash away your impurities.'")
-    print("As you begin to do so, the villager walks to the far side of the room and sits on the floor.")
+    print_msg3 = """You give them a sheepish grimmace, attempting to hide your
+nude body in the shallow basin. 'I wasnt sure how to use them, or what they
+were and didnt want to risk it.' They smile as they walk to the boxes and
+pull out a ladle, stooping they scoop some of the powder out of one of the
+boxes and walk toward you. In a wide arc they toss the powder into the
+basin and it immediately begins to fizz and foam. 'Now rub the foam on your
+skin, it will wash away your impurities.' As you begin to do so, the
+villager walks to the far side of the room and sits on the floor."""
+    print(print_msg3)
     hld = str(input(""))
-    print("'It really is quite fortuitous that you arrived today of all days.'")
-    print("'She the Seer spoke of the arrival of one from beyond. I couldnt dream of doubting her word, but it seemed too wonderous to be true'")
-    print("You look at them from over the rim of the basin, 'Who is the seer? She knew I was comming?'")
-    print("The villager smiled snarkly, 'Well she didnt know you were comming, but that someone was. Or something at least.'")
-    print("'Is she like a psychic os something?' You bask in the warm water, letting yourself get soggy.")
+    print_msg4 = """'It really is quite fortuitous that you arrived today of
+all days'. 'She the Seer spoke of the arrival of one from beyond. I couldnt
+dream of doubting her word, but it seemed too wonderous to be true'. You
+look at them from over the rim of the basin, 'Who is the seer? She knew I
+was coming?' The villager smiled snarkly, 'Well she didnt know you were
+comming, but that someone was. Or something at least.' 'Is she like a
+psychic or something?' You bask in the warm water, letting yourself get
+soggy."""
+    print(print_msg4)
     hld = str(input(""))
-    print("'She the Seer is the counterpart to Gladion, as he is to her.' Raising from the floor they grab a folded cloth from a shelf and hand it to you.")
-    print("'Together they represent the all, male to female, tangible and formless, here to the beyond and all that is between.'")
-    print("The villager's eyes glaze over while saying this, as if reverting to somewhere deep in their conciousness.")
-    print("Returning to the present, they look at you and smile. 'You'll meet her later probably, during the ceremony.'")
+    print_msg5 = """'She the Seer is the counterpart to Gladion, as he is to her.'
+Raising from the floor they grab a folded cloth from a shelf and hand it to
+you. 'Together they represent the all, male to female, tangible and
+formless, here to the beyond and all that is between.' The villager's eyes
+glaze over while saying this, as if reverting to somewhere deep in their
+conciousness. Returning to the present, they look at you and smile. 'You'll
+meet her later probably, during the ceremony.'"""
+    print(print_msg5)
     hld = str(input(""))
-    print("Once you had stepped out of the basin you dryed youself off, the vilager politely turne tsheir back, though for some reason you feel at ease nude in their presence.")
-    print("They hand you some clothes and sandles, look you over and smile coyly, 'You really are quite similar to us though you come from so far.'")
-    print("You detect a playfulness in their voice as they drift towards the door. 'Tis a shame, maybe in another life perhaps.'")
-    print("In the doorway they turn on their heel and face you. 'Ill see you in a bit, come outside when you are done.'")
-    print("You call to them as they turn to leave, 'Wait, what's your name?'")
-    print("They turn to you and smile, looking you over again, ")
+    print_msg6 = """Once you had stepped out of the basin you dryed youself off,
+the villager politely turns their back, though for some reason you feel at
+ease nude in their presence. They hand you some clothes and sandles, look
+you over and smile coyly, 'You really are quite similar to us though you
+come from so far.' You detect a playfulness in their voice as they drift
+towards the door. 'Tis a shame, maybe in another life perhaps.' In the
+doorway they turn on their heel and face you. 'Ill see you in a bit, come
+outside when you are done.' You call to them as they turn to leave, 'Wait,
+what's your name?' They turn to you and smile, looking you over again."""
+    print(print_msg6)
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return Scenes.CEREMONY_OF_LIGHT, Scenes.CEREMONY_OF_LIGHT
@@ -1068,53 +1235,76 @@ def lightVillage(state):
 
 
 def ceremonyOfLight(state):
-    print("You sit on the ground on the center of the village with the others, the excitement in the air sizzles around you.")
-    print("At the middle of the village center sits a roaring fire, its warmth bathes the village and keeps the evening chill at bay.")
-    print("The villagers chatter to eachother in an unfamiliar language, passing bowls of food and drink to one another and laughing")
-    print("You gladly take the food and try it gratefully, it has been a long time since you had eaten last.")
-    print("The chatter quiets as Gladion steps gracefully onto the stone platform next to the fire, he is garbed in red and gold.")
-    print("The last of the chatter dies as he raises his hands.")
+    print_msg = """You sit on the ground on the center of the village with
+the others, the excitement in the air sizzles around you. At the middle of
+the village center sits a roaring fire, its warmth bathes the village and
+keeps the evening chill at bay. The villagers chatter to eachother in an
+unfamiliar language, passing bowls of food and drink to one another and
+laughing. You gladly take the food and try it gratefully, it has been a
+long time since you had eaten last. The chatter quiets as Gladion steps
+gracefully onto the stone platform next to the fire, he is garbed in red
+and gold. The last of the chatter dies as he raises his hands."""
+    print(print_msg)
     hld = str(input(""))
-    print("'People of the light, we are joined this ceremony of the cycles by a being from beyond our forest.'")
-    print("'It is for his benefit that I speak in uncommon tounge', there is chatter of recognition amonst the crowd, many eyes land on you.")
-    print("'It is as She the Seer predicted, one from beyond shall join the people of the light for the Celebration of Cycles!!'")
-    print("The crowd cheers, and as you look around you notice a tall beautiful woman walk from the back of the crowd towards the front.")
-    print("She is wearing robes of white and silver, and walkes with an alien grace.")
+    print_msg1 = """'People of the light, we are joined this ceremony of the cycles
+by a being from beyond our forest.' 'It is for his benefit that I speak in
+uncommon tounge', there is chatter of recognition amonst the crowd, many
+eyes land on you. 'It is as She the Seer predicted, one from beyond shall
+join the people of the light for the Celebration of Cycles!!' The crowd
+cheers, and as you look around you notice a tall beautiful woman walk from
+the back of the crowd towards the front. She is wearing robes of white and
+silver, and walkes with an alien grace."""
+    print(print_msg1)
     hld = str(input(""))
-    print("The crowds cheering grows as the woman reaches the small stage and takes a seat on the intricately carved chair next to Gladion's.")
-    print("'Welcome my love, my other half, two as one as whole is one!'")
-    print("The crowd chantes after Gladion, 'Two as one whole as one!'")
-    print("The woman raises her hand and waves at the crowd calmly, a serene smile on her face.")
-    print("Gladion chuckles lightly and waves at the small village to quiet.")
+    print_msg2 = """The crowds cheering grows as the woman reaches the small stage
+and takes a seat on the intricately carved chair next to Gladion's.
+'Welcome my love, my other half, two as one as whole is one!' The crowd
+chantes after Gladion, 'Two as one whole as one!' The woman raises her hand
+and waves at the crowd calmly, a serene smile on her face. Gladion chuckles
+lightly and waves at the small village to quiet."""
+    print(print_msg2)
     hld = str(input(""))
-    print("'Here again after another seasonal cycle. It is so good to see you all again.' He stands with his hands held held wide above his head.")
-    print("'Time has passed us by as it does, and there have been times both bad and good.'")
-    print("'The rise and fall of tensions within and without has affected us all and left us more.'")
-    print("'We grow as we watch ourselves struggle through life, learning as we do.'")
-    print("But the struggle leaves scars and sores that sit deep down and ache and fester.")
+    print_msg3 = """'Here again after another seasonal cycle. It is so good to see
+you all again.' He stands with his hands held held wide above his head.
+'Time has passed us by as it does, and there have been times both bad and
+good'. 'The rise and fall of tensions within and without has affected us
+all and left us more.' 'We grow as we watch ourselves struggle through
+life, learning as we do.' But the struggle leaves scars and sores that sit
+deep down and ache and fester."""
+    print(print_msg3)
     hld = str(input(""))
-    print("The crowd around you has become deathly quiet, their excitement has gone from bubbling chatter to brittle tension.")
-    print("'These wounds are too much to bear, and blind us from truth. Blind us from the light!'. Gladion scans the crowd, shifting from eye to eye.")
-    print("'And so the Celebration of the Cycles cleanses us.' He raises his face to the sky and stares at the sun, eyes wide.")
-    print("'Through it we are cleaned of the sores we have gained, through ones suffering we become pure!'")
-    print("You look around nervously, the crowd has regained their vigor. They begin to fidget and chatter with fervor.")
+    print_msg4 = """The crowd around you has become deathly quiet, their
+excitement has gone from bubbling chatter to brittle tension. 'These wounds
+are too much to bear, and blind us from truth. Blind us from the light!'.
+Gladion scans the crowd, shifting from eye to eye. 'And so the Celebration
+of the Cycles cleanses us.' He raises his face to the sky and stares at the
+sun, eyes wide. 'Through it we are cleaned of the sores we have gained,
+through ones suffering we become pure!' You look around nervously, the
+crowd has regained their vigor. They begin to fidget and chatter with
+fervor."""
+    print(print_msg4)
     hld = str(input(""))
-    print("'And this Cycle of Cycles which has been particularly hard on us, the light has brought us a special gift as offering.'")
-    print("The hair on your neck sparks and raises sharply. You look around you, the village is looking at you hungrily.")
-    print("You look up to Gladion and lock eyes with him. He holds your gaze intensely, his peaceful smile curling at the corners.")
-    print("'Thank you for embodying our passage to purity and acting as a vessel of the light. I hope you suffer beautifully.'")
+    print_msg5 = """'And this Cycle of Cycles which has been particularly hard on us,
+the light has brought us a special gift as offering.' The hair on your neck
+sparks and raises sharply. You look around you, the village is looking at
+you hungrily. You look up to Gladion and lock eyes with him. He holds your
+gaze intensely, his peaceful smile curling at the corners. 'Thank you for
+embodying our passage to purity and acting as a vessel of the light. I hope
+you suffer beautifully.'"""
+    print(print_msg5)
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return Scenes.COL_ENCOUNTER, Scenes.COL_ENCOUNTER
 
 def COLEncounter(state):
-    print("")
-    print("-")
-    print("-")
-    print("BACKWOODS to go to backwoods area")
-    print("go to backwoods?")
-    print("BACKWOODS to go to backwoods area")
-    print("BACKWOODS to go to backwoods area")
+    print_msg = """You are being surrounded by the members of the village. They close
+in upon you with hungry eyes. As they close in you notice a break in the
+crowd to your left. You duck and run through, pushing their hands aside.
+You are now on the outskirts of the crowd, your only options for escape are
+to right or to the left. """
+    choice_msg = """Which would you like to do?\nLEFT run to the left\nRIGHT run to the right\nBACKWOODS for now"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1124,14 +1314,11 @@ def COLEncounter(state):
     )
     
 def backwoods(state):
-    print("Backwoods area")
-    print("goes to puzzle area, clearing with cave entrance, forest entrance")
-    print("-")
-    print("-")
-    print("Where to go?")
-    print("to PUZZLE")
-    print("to CAVE entrance")
-    print("to forest ENTRANCE")
+    print_msg = """Backwoods area\ngoes to puzzle area, clearing with cave entrance,
+forest entrance."""
+    choice_msg = """Where to go?\nto PUZZLE\nto CAVE entrance\nto forest ENTRANCE"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1143,13 +1330,13 @@ def backwoods(state):
     )
 
 def forestCaveClearingIn(state):
-    print("You enter a small clearing with a gnalred tree against a large rock")
-    print("As you approach the tree you see a gap between the roots and the rock,")
-    print("it seems to extend under the rock and from a certatin angle it almost")
-    print("looks like the opening widenes further down.")
-    print("Do you want to go down?")
-    print("go down into the HOLE")
-    print("Go BACK the way you came")
+    print_msg = """You enter a small clearing with a gnalred tree against a large
+rock. As you approach the tree you see a gap between the roots and the
+rock, it seems to extend under the rock and from a certatin angle it almost
+looks like the opening widenes further down."""
+    choice_msg = """Do you want to go down?\ngo down into the HOLE\nGo BACK the way you came"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1160,13 +1347,10 @@ def forestCaveClearingIn(state):
     )
 
 def forestCaveClearingOut(state):
-    print("You crawl out of the tight hole, using roots to pull yourself up")
-    print("You are in a clearing")
-    print("-")
-    print("-")
-    print("where to go?")
-    print("go into forest FOREST")
-    print("Go back into HOLE")
+    print_msg = """You crawl out of the tight hole, using roots to pull yourself up. You are in a clearing. """
+    choice_msg = """Where to go?\nGo into forest FOREST\nGo back into HOLE"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1178,19 +1362,19 @@ def forestCaveClearingOut(state):
 
 
 def forestCaveEntranceIn(state):
-    print("Going feet first you lower yourself into the opening.") 
-    print("Using the roots of the tree you lower yourself")
-    print("into an underground chamber. Light peeks in from cracks in the rock and the")
-    print("hole you just climbed through. The light reflects off of crystals on the")
-    print("floor and walls, shimmering slits cut accross one another and provide a dim glow.")
-    print("The sharp refractions of the crystals are sofened by a dim swirling wash.")
-    print("You notice a wetness to the echo of the chamber and move deeper in.")
-    print("In the center is a round pool that seems to continue down forever.")
-    print("On closer inspection you find that the walls of the pool end afer about 10 feet")
-    print("and give way to open water. In the dim light of the cave you cant see much.")
-    print("What would you like to do?")
-    print("JUMP in the pool")
-    print("go BACK out to the clearing")
+    print_msg = """Going feet first you lower yourself into the opening.
+Using the roots of the tree you lower yourself into an underground chamber.
+Light peeks in from cracks in the rock and the hole you just climbed
+through. The light reflects off of crystals on the floor and walls,
+shimmering slits cut accross one another and provide a dim glow. The sharp
+refractions of the crystals are sofened by a dim swirling wash. You notice
+a wetness to the echo of the chamber and move deeper in. In the center is a
+round pool that seems to continue down forever. On closer inspection you
+find that the walls of the pool end afer about 10 feet and give way to open
+water. In the dim light of the cave you cant see much."""
+    choice_msg = """What would you like to do?\nJUMP in the pool\ngo BACK out to the clearing""" 
+    print(print_msg) 
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -1202,15 +1386,11 @@ def forestCaveEntranceIn(state):
     )
 
 def forestCaveEntranceOut(state):
-    print("Pull yourself out of pool.") 
-    print("crystal cavern")
-    print("Pool behind you, hole that lights coming in through")
-    print("-")
-    print("-")
-    print("-")
-    print("What would you like to do?")
-    print("JUMP in the pool")
-    print("climb out of the HOLE")
+    print_msg = """Pull yourself out of pool.\ncrystal cavern\nPool behind you, hole 
+that lights coming in through"""
+    choice_msg = """What would you like to do?\nJUMP in the pool\nclimb out of the HOLE"""
+    print(print_msg) 
+    print(choice_msg)
     print(f"| {state} |")
     return get_input(
         state.current_scene,
@@ -1223,30 +1403,301 @@ def forestCaveEntranceOut(state):
 
 
 def forestPuzzle(state):
-    print("Theres gonna be a puzzle here of some sort")
-    print("for now connects straight to forest mountain path")
-    print("Can also go to ")
-    print("-")
-    print("where to go?")
-    print("go back to BACKWOODS")
-    print("go to forest mountain PATH")
+    print_msg = """As you travel through the dark woods you notice the sun beginning
+to break through the trees. Looking ahead you notice the path starting
+slope upwards. As you follow it upwards you find yourself on the middle of
+a bridge. Around you is what looks like a square arrangement of ruins. The
+bridge ahead continues downward again until it levels with the ground."""
+    choice_msg = """Where to go?\ngo back to BACKWOODS\ncontinue to PUZZLE"""
+    print(print_msg)
+    print(choice_msg)
+
     return get_input(
         state.current_scene,
         {
             'BACKWOODS': Scenes.BACKWOODS,
-            'PATH': Scenes.FOREST_MOUTAIN_PATH
+            'PUZZLE': Scenes.FOREST_PUZZLE_CENTER
         },
-        "BACKWOODS, PATH"
+        "BACKWOODS, PUZZLE"
     )
 
+def forestPuzzleCenter(state):
+    if not state.puzzle_is_valid():
+        state.reset_board()
+    if state.get_new_puzzle():
+        state.reset_board()
+    if state.puzzle_complete():
+        print_msg = """As you return to the center puzzle section you notice a change
+to the region. The lanterns are all lit and there is now a hole in the ground
+in the middle of the square of stones. You cautiously move forward into the 
+hole"""
+        print(print_msg)
+        hld = str(input(""))
+        os.system('cls' if os.name == 'nt' else 'clear')
+        return state.current_scene, Scenes.FOREST_MOUTAIN_PATH
+    if state.is_init_puzzle():
+        state.init_puzzle_false()
+        print_msg = f"""As you decend the far side of the bridge you find yourself in 
+the middle of a clearing covered by ruins. The ruins seem to be divided into
+a nine section square, you being in the center section. On the ground before
+you is a square of 8 stones, 4 corners 4 sides. Each stone has a number 
+carved into it and an unlit lantern above it. 
+            \n{state.puzzle_string[0:1]} {state.puzzle_string[1:2]} {state.puzzle_string[2:3]}\n{state.puzzle_string[3:4]}   {state.puzzle_string[4:5]}\n{state.puzzle_string[5:6]} {state.puzzle_string[6:7]} {state.puzzle_string[7:8]}
+
+            """
+    else:
+        triggered_temp = ""
+        for idx, x in enumerate(state.puzzle_triggered):
+            if x:
+                triggered_temp = f"{triggered_temp} | {idx}"
+        print_msg = f"""You return to the center square of the ruins. The square of
+stones have the folowing aranngement
+            \n{state.puzzle_string[0:1]} {state.puzzle_string[1:2]} {state.puzzle_string[2:3]}\n{state.puzzle_string[3:4]}   {state.puzzle_string[4:5]}\n{state.puzzle_string[5:6]} {state.puzzle_string[6:7]} {state.puzzle_string[7:8]}
+            
+        The following lanterns are lit:
+            \n{triggered_temp}
+            """
+    choice_msg = """Where to go?\ngo back to BACKWOODS\nFIRST section\nSECOND section\nTHIRD section\nFOURTH section\nFIFTH section\nSIXTH section\nSEVENTH section\nEIGHTH section"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACKWOODS': Scenes.BACKWOODS,
+            'FIRST': Scenes.FOREST_PUZZLE_ONE,
+            'SECOND': Scenes.FOREST_PUZZLE_TWO,
+            'THIRD': Scenes.FOREST_PUZZLE_THREE,
+            'FOURTH': Scenes.FOREST_PUZZLE_FOUR,
+            'FIFTH': Scenes.FOREST_PUZZLE_FIVE,
+            'SIXTH': Scenes.FOREST_PUZZLE_SIX,
+            'SEVENTH': Scenes.FOREST_PUZZLE_SEVEN,
+            'EIGHTH': Scenes.FOREST_PUZZLE_EIGHT
+        },
+        "BACKWOODS, FIRST, SECOND, THIRD, FOURTH, FIFTH, SIXTH, SEVENTH, EIGHTH"
+    )
+
+def forestPuzzleOne(state):
+    num = state.section_number()
+    print_msg = """You enter the  first square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """What what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_ONE_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def forestPuzzleTwo(state):
+    num = state.section_number()
+    print_msg = """You enter the second square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+    state.current_scene,
+    {
+        'BACK': Scenes.FOREST_PUZZLE_CENTER,
+        'PULL': Scenes.PUZZLE_TWO_TRIGGER
+    },
+        "BACK, PULL"
+    )
+
+def forestPuzzleThree(state):
+    num = state.section_number()
+    print_msg = """You enter the third square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_THREE_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def forestPuzzleFour(state):
+    num = state.section_number()
+    print_msg = """You enter the fourth square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_FOUR_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def forestPuzzleFive(state):
+    num = state.section_number()
+    print_msg = """You enter the five square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_FIVE_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def forestPuzzleSix(state):
+    num = state.section_number()
+    print_msg = """You enter the sixth square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+    state.current_scene,
+    {
+        'BACK': Scenes.FOREST_PUZZLE_CENTER,
+        'PULL': Scenes.PUZZLE_SIX_TRIGGER
+    },
+        "BACK, PULL"
+    )
+
+def forestPuzzleSeven(state):
+    num = state.section_number()
+    print_msg = """You enter the seventh square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_SEVEN_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def forestPuzzleEight(state):
+    num = state.section_number()
+    print_msg = """You enter the eighth square. It is empty save for two rocks in the 
+middle. One has the number {num} carved into it. The other has a lever
+sticking out of it."""
+    choice_msg = """Where what would you like to do?\ngo BACK to center square\nPULL the lever"""
+    print(print_msg)
+    print(choice_msg)
+    return get_input(
+        state.current_scene,
+        {
+            'BACK': Scenes.FOREST_PUZZLE_CENTER,
+            'PULL': Scenes.PUZZLE_EIGHT_TRIGGER
+        },
+        "BACK, PULL"
+    )
+
+def puzzleTriggerOne(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[0] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerTwo(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[1] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerThree(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[2] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerFour(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[3] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerFive(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[4] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerSix(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[5] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerSeven(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[6] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
+def puzzleTriggerEight(state):
+    print_msg = """You reach forward and grab the lever. There is a slight rumble and a click
+at the base. You you wait a second in silence before returning to the
+center section"""
+    print(print_msg)
+    state.puzzle_triggered[7] = True;
+    hld = str(input(""))
+    os.system('cls' if os.name == 'nt' else 'clear')
+    return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
+
 def forestMountainPath(state):
-    print("Forest mountain path")
-    print("connects forest puzzle to the mountain base")
-    print("-")
-    print("-")
-    print("where to go?")
-    print("forest PUZZLE")
-    print("mountain BASE")
+    print_msg = """You find yourself on a path that connects the forest puzzle with the
+base of the mountain"""
+    choice_msg = """where to go?\nforest PUZZLE\nmountain BASE"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1257,13 +1708,11 @@ def forestMountainPath(state):
     )
 
 def mountainPath1(state):
-    print("Mountain path 1 ")
-    print("connects CLEARING to mountain path 2")
-    print("-")
-    print("-")
-    print("where to go?")
-    print("back to CLEARING")
-    print("to mountian PATH")
+    print_msg = """You find yourself on a path that connects the clearing with the
+mountain path."""
+    choice_msg = """Where to go?\nback to CLEARING\nto mountian PATH""" 
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1292,13 +1741,11 @@ def mountainPath2(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
-    print("mountain path 2")
-    print("connects mountain path 1 to mountain base")
-    print("should have encounter here")
-    print("-")
-    print("where to go?")
-    print("go to mountain PATH")
-    print("mountain ENTRANCE")
+    print_msg = """You find yourself on a path that connects the mountain path and the base
+of the mountain"""
+    choice_msg = """where to go?\ngo to mountain PATH\ngo to BASE of the mountain"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1309,14 +1756,10 @@ def mountainPath2(state):
     )
 
 def mountainBase(state):
-    print("Base of the mountain")
-    print("Some people here to talk to")
-    print("maybe sell some stuff")
-    print("also connects to forest mountain path")
-    print("where to go?")
-    print("BACK to mountain path")
-    print("mountain ENTRANCE")
-    print("forest mountain PATH")
+    print_msg = """Base of the mountain\nSome people here to talk to\nmaybe sell some stuff\nalso connects to forest mountain path"""
+    choice_msg = """where to go?\nBACK to mountain path\nmountain ENTRANCE\nforest mountain PATH"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1346,13 +1789,10 @@ def mountainEntrance(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
-    print("Mountain entrance")
-    print("connects mountain base to m_LVL1_R1")
-    print("encounter here")
-    print("-")
-    print("where go?")
-    print("mountain BASE")
-    print("to LVL1")
+    print_msg = """Mountain entrance\nconnects mountain base to m_LVL1_R1\nencounter here"""
+    choice_msg = """where go?\nmountain BASE\nto LVL1"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1381,13 +1821,10 @@ def mLvl1R1(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
-    print("first room on the first floor")
-    print("currently connects to LVL1Stairs through mountain cave entrance")
-    print("also connects to mountain entrance")
-    print("-")
-    print("where?")
-    print("mountain ENTRANCE")
-    print("to MCAVE")
+    print_msg = """first room on the first floor\ncurrently connects to LVL1Stairs through mountain cave entrance\nalso connects to mountain entrance"""
+    choice_msg = """where?\nmountain ENTRANCE\nto MCAVE"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1416,14 +1853,10 @@ def mountainCaveEntrance(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
-    print("Mountain cave entrance")
-    print("maountain entrance to underwater cave")
-    print("also connects LVL1 R1 and LVL1 Stairs")
-    print("-")
-    print("where?")
-    print("to LVL1")
-    print("to CAVE")
-    print("to USTAIRS lvl1 stairs")
+    print_msg = """Mountain cave entrance\nmountain entrance to underwater cave\nalso connects LVL1 R1 and LVL1 Stairs"""
+    choice_msg = """where?\nto LVL1\nto CAVE\nto USTAIRS lvl1 stairs"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1453,13 +1886,10 @@ def mLvl1Stairs(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
-    print("lvl1 stairs")
-    print("connects lvl1 and lvl2")
-    print("currently goes from mountain cave entrance to LVL2 R1")
-    print("-")
-    print("where?")
-    print("to MCAVE")
-    print("to LVL2")
+    print_msg = """lvl1 stairs\nconnects lvl1 and lvl2\ncurrently goes from mountain cave entrance to LVL2 R1"""
+    choice_msg = """where?\nto MCAVE\nto LVL2"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1470,13 +1900,10 @@ def mLvl1Stairs(state):
     )
 
 def mLvl2R1(state):
-    print("mountain LVL 2")
-    print("connects to LVL1STAIRS and LVL2Stairs")
-    print("-")
-    print("-")
-    print("where?")
-    print("go USTAIRS staircase to lvl3")
-    print("go DSTAIRS staircase to lvl1")
+    print_msg = """mountain LVL 2\nconnects to LVL1STAIRS and LVL2Stairs"""
+    choice_msg = """where?\ngo USTAIRS staircase to lvl3\ngo DSTAIRS staircase to lvl1"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1487,13 +1914,10 @@ def mLvl2R1(state):
     )
 
 def mLvl2Stairs(state):
-    print("mountain lvl2 stairs to lvl 3")
-    print("connects lvl2 to lvl3")
-    print("-")
-    print("-")
-    print("where?")
-    print("to LVL2")
-    print("to LVL3")
+    print_msg = """mountain lvl2 stairs to lvl 3\nconnects lvl2 to lvl3"""
+    choice_msg = """where?\nto LVL2\nto LVL3"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1504,13 +1928,10 @@ def mLvl2Stairs(state):
     )
 
 def mLv32R1(state):
-    print("mountain lvl 3")
-    print("connects to lvl2 stairs and lvl3stairs to boss")
-    print("-")
-    print("-")
-    print("Where?")
-    print("to DSTAIRS staircase to lvl2")
-    print("to USTAIRS staircase to lvl3")
+    print_msg = """mountain lvl 3\nconnects to lvl2 stairs and lvl3stairs to boss"""
+    choice_msg = """Where?\nto DSTAIRS staircase to lvl2\nto USTAIRS staircase to lvl3"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1521,13 +1942,10 @@ def mLv32R1(state):
     )
 
 def mLvl3Stairs(state):
-    print("mountain lvl 3 stairs")
-    print("connect lvl3 with boss area")
-    print("-")
-    print("-")
-    print("where?")
-    print("to LVL3")
-    print("UP to boss area")
+    print_msg = """mountain lvl 3 stairs\nconnect lvl3 with boss area"""
+    choice_msg = """where?\nto LVL3\nUP to boss area"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1538,12 +1956,10 @@ def mLvl3Stairs(state):
     )
 
 def bossArea(state):
-    print("Boss area")
-    print("where final encounter will take place")
-    print("goes only back to LVL3 stairs")
-    print("-")
-    print("where?")
-    print("BACK down stairs")
+    print_msg = """Boss area\nwhere final encounter will take place\ngoes only back to LVL3 stairs"""
+    choice_msg = """where?\nBACK down stairs"""
+    print(print_msg)
+    print(choice_msg)
     return get_input(
         state.current_scene,
         {
@@ -1557,7 +1973,7 @@ def main():
     # p = Player()
     print("Welcome to VALLEY QUEST!!!")
     print("KEYWORDS displayed in CAPS are used to make decisions,")
-    print("The decisions made availiable to you will be determined by your previous actions")
+    print("")
     play = str(input(""))
     print("would you like to play? Y/N")
     play = str(input(": ")).upper()
