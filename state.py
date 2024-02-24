@@ -1,7 +1,8 @@
 import json
 from os import name
 import os
-from random import random
+import time
+import random
 from random import seed
 import math
 from enum import Enum, auto
@@ -13,7 +14,7 @@ from inventory import Inventory
 # from scenes import Beginning
 
 PUZZ_ROW = 2
-PUZZ_COL = 7
+PUZZ_COL = 8
 
 def remfront(st):
     remain = st[1:]
@@ -96,9 +97,15 @@ class State:
         }
         self.init_puzzle = True
         # self.reset_puzzle = True
-        self.puzzle_arr = [[0]*PUZZ_COL]*PUZZ_ROW
+        self.puzzle_arr = [[0] * PUZZ_COL for _ in range(PUZZ_ROW)]
         self.puzzle_triggered = [False, False, False, False, False, False, False, False]
         self.puzzle_sections = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        self.puzzle_stuff = {
+                'arr': [[0] * PUZZ_COL for _ in range(PUZZ_ROW)],
+                'triggered': [False, False, False, False, False, False, False, False],
+                'sections': ["1", "2", "3", "4", "5", "6", "7", "8"],
+                'key': ""
+            }
         self.sceneMap = {
             Scenes.BEGINNING: getattr(scenes, 'beginning'),
             Scenes.ENTER_FOREST: getattr(scenes, 'enter_forest'),
@@ -373,13 +380,22 @@ class State:
         self.current_scene = scene
 
     def reset_board(self):
-        for i in range(0,1):
-            temp_sections = self.puzzle_sections
+        for i in range(0, 2):
+            random.seed(time.time())
+            print(f"i: {i}")
+            temp_sections = list(self.puzzle_stuff['sections'])
             for l in range(len(temp_sections)):
-                temp_rand = math.floor((random() * len(temp_sections) - 1))
-                # self.puzzle_string = f'{self.puzzle_string}{temp_sections[temp_rand]}'
-                self.puzzle_arr[i][l] = temp_rand
-                del temp_sections[temp_rand]
+                lf.puzzle_string = f'{self.puzzle_string}{temp_sections[temp_rand]}'
+                item = random.choice(temp_sections)
+                self.puzzle_stuff['arr'][i][l] = item
+                temp_sections.remove(item)
+        print(f"puzzle: {self.puzzle_stuff['arr']}")
+        temp = ''
+        for i in range(1, 9):
+            idx = self.puzzle_stuff['arr'][0].index(str(i))
+            temp += self.puzzle_stuff['arr'][1][idx]
+        self.puzzle_stuff['key'] = temp
+        print(f"Key: {self.puzzle_stuff['key']}")
 
     def puzzle_is_valid(self):
 

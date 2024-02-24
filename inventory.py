@@ -1,7 +1,3 @@
-#inv
-
-
-
 #   - Inventory Class
 #
 #   used to manage inventory

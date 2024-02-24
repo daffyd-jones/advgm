@@ -3,6 +3,7 @@
 from enums import Scenes, InvItem
 from os import name
 import os
+import time
 
 #############
 #
@@ -850,7 +851,7 @@ the middle of a clearing covered by ruins. The ruins seem to be divided into
 a nine section square, you being in the center section. On the ground before
 you is a square of 8 stones, 4 corners 4 sides. Each stone has a number
 carved into it and an unlit lantern above it.
-            \n{state.puzzle_string[0:1]} {state.puzzle_string[1:2]} {state.puzzle_string[2:3]}\n{state.puzzle_string[3:4]}   {state.puzzle_string[4:5]}\n{state.puzzle_string[5:6]} {state.puzzle_string[6:7]} {state.puzzle_string[7:8]}
+            \n{state.puzzle_stuff['arr'][0][0]} {state.puzzle_stuff['arr'][0][1]} {state.puzzle_stuff['arr'][0][2]}\n{state.puzzle_stuff['arr'][0][3]}   {state.puzzle_stuff['arr'][0][4]}\n{state.puzzle_stuff['arr'][0][5]} {state.puzzle_stuff['arr'][0][6]} {state.puzzle_stuff['arr'][0][7]}
 
             """
     else:
@@ -860,7 +861,7 @@ carved into it and an unlit lantern above it.
                 triggered_temp = f"{triggered_temp} | {idx}"
         print_msg = f"""You return to the center square of the ruins. The square of
 stones have the folowing aranngement
-            \n{state.puzzle_string[0:1]} {state.puzzle_string[1:2]} {state.puzzle_string[2:3]}\n{state.puzzle_string[3:4]}   {state.puzzle_string[4:5]}\n{state.puzzle_string[5:6]} {state.puzzle_string[6:7]} {state.puzzle_string[7:8]}
+            \n{state.puzzle_stuff['arr'][0][0]} {state.puzzle_stuff['arr'][0][1]} {state.puzzle_stuff['arr'][0][2]}\n{state.puzzle_stuff['arr'][0][3]}   {state.puzzle_stuff['arr'][0][4]}\n{state.puzzle_stuff['arr'][0][5]} {state.puzzle_stuff['arr'][0][6]} {state.puzzle_stuff['arr'][0][7]}
 
         The following lanterns are lit:
             \n{triggered_temp}
