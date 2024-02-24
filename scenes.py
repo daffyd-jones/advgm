@@ -1,4 +1,3 @@
-#asdf
 
 # import enums
 from enums import Scenes, InvItem
@@ -1133,13 +1132,13 @@ mountain path."""
 
 def mountain_path_2(state):
     win = state.encounter(
-        probOfAttack = 0.6,
+        probOfAttack = 0.4,
         encounterMap = {
             'name': 'racoon man',
             'hp': 20,
-            'defence': 10,
+            'defence': 4,
             'hit_rate': 2,
-            'attack': 10,
+            'attack': 4,
             'prize': InvItem.HEALTH_POTION,
             'intro_txt': 'there is a guy in the road that blocks your way. he has racoons on him. he says:  hey i dont like you so im gonna stab ya.',
             'fight_txt': [
@@ -1150,6 +1149,8 @@ def mountain_path_2(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
+    if not win:
+        return None, None
     print_msg = """You find yourself on a path that connects the mountain path and the base
 of the mountain"""
     choice_msg = """where to go?\ngo to mountain PATH\ngo to BASE of the mountain"""
@@ -1181,13 +1182,13 @@ def mountain_base(state):
 
 def mountain_entrance(state):
     win = state.encounter(
-        0.6,
+        0.1,
         encounterMap = {
             'name': 'racoon man',
             'hp': 20,
-            'defence': 6,
+            'defence': 4,
             'hit_rate': 2,
-            'attack': 6,
+            'attack': 2,
             'prize': "health",
             'intro_txt': 'hey i dont like you so im gonna stab ya.',
             'fight_txt': [
@@ -1198,6 +1199,8 @@ def mountain_entrance(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
+    if not win:
+        return None, None
     print_msg = """Mountain entrance\nconnects mountain base to m_LVL1_R1\nencounter here"""
     choice_msg = """where go?\nmountain BASE\nto LVL1"""
     print(print_msg)
@@ -1230,6 +1233,8 @@ def m_lvl1_r1(state):
             'after_txt': 'ok you win ouch. have a health potion',
         },
     )
+    if not win:
+        return None, None
     print_msg = """first room on the first floor\ncurrently connects to LVL1Stairs through mountain cave entrance\nalso connects to mountain entrance"""
     choice_msg = """where?\nmountain ENTRANCE\nto MCAVE"""
     print(print_msg)

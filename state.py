@@ -1,4 +1,3 @@
-#asdf
 import json
 from os import name
 import os
@@ -188,6 +187,9 @@ class State:
             if self.current_scene == Scenes.MENU:
                 self.use_menu()
             self.current_scene, self.scene_hold = self.sceneMap[self.current_scene](self)
+            if self.current_scene == None:
+                return None
+                pass
 
 
 
@@ -284,6 +286,7 @@ class State:
         print(f"Encounter with {encounterMap['name']} ")
         print(f"")
         print(f"{ intro_txt }")
+        # input(": ")
         fight = True
         hp = encounterMap["hp"]
         attack = encounterMap["attack"]
@@ -292,6 +295,8 @@ class State:
         if coin > 0.5:
             you_turn = False
         while fight:
+            input(": ")
+            os.system('cls' if os.name == 'nt' else 'clear')
             if you_turn:
                 you_turn = False
             else:
@@ -308,13 +313,14 @@ class State:
                 pturn = True
                 while pturn:
                     response = str(input(": ")).upper()
+                    print("")
                     if response == "HEALTH":
                         pturn = False
-                        # self.use_health_potion()
+                        self.hp += 10
                         pass
                     elif response == "POWER":
                         pturn = False
-                        # self.use_power_up()
+                        self.hit_rate += 2
                         pass
                     elif response == "ATTACK":
                         pturn = False
@@ -334,7 +340,7 @@ class State:
                     else:
                         print("Not a valid response")
             else:
-                print(f"It is {encounterMap['name']}'s turn")
+                print(f"\nIt is {encounterMap['name']}'s turn")
                 seed(random())
                 c = 0
                 acc = 0
@@ -351,7 +357,8 @@ class State:
                 else:
                     print(f"{encounterMap['name']}'s attack missed")
             if self.hp <= 0:
-                print('you have died')
+                print('\nyou have died')
+                input(": ")
                 return False
             if hp <= 0:
                 print(f"you beat {encounterMap['name']}")
