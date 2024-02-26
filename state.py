@@ -405,8 +405,18 @@ class State:
         return self.puzzle_triggered.count(True) == 8
 
     def section_number(self, section):
-        parts = self.puzzle_string.split("|")
-        return parts[1][int(parts[0][section])]
+        return self.puzzle_stuff['arr'][1][section]
+
+    def puzzle_check_move(self, num):
+        t = True
+        for i in range(1 , num):
+            if not self.puzzle_stuff['triggered'][i]:
+                t = False
+        if not t:
+            self.reset_board()
+            return
+        t = self.puzzle_stuff['key'][]
+
 
     def get_new_puzzle(self):
         return self.reset_puzzle

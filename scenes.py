@@ -886,7 +886,7 @@ stones have the folowing aranngement
     )
 
 def forest_puzzle_one(state):
-    num = state.section_number()
+    num = state.section_number(1)
     print_msg = """You enter the  first square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -903,7 +903,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_two(state):
-    num = state.section_number()
+    num = state.section_number(2)
     print_msg = """You enter the second square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -920,7 +920,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_three(state):
-    num = state.section_number()
+    num = state.section_number(3)
     print_msg = """You enter the third square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -937,7 +937,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_four(state):
-    num = state.section_number()
+    num = state.section_number(4)
     print_msg = """You enter the fourth square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -954,7 +954,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_five(state):
-    num = state.section_number()
+    num = state.section_number(5)
     print_msg = """You enter the five square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -971,7 +971,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_six(state):
-    num = state.section_number()
+    num = state.section_number(6)
     print_msg = """You enter the sixth square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -988,7 +988,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_seven(state):
-    num = state.section_number()
+    num = state.section_number(7)
     print_msg = """You enter the seventh square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -1005,7 +1005,7 @@ sticking out of it."""
     )
 
 def forest_puzzle_eight(state):
-    num = state.section_number()
+    num = state.section_number(8)
     print_msg = """You enter the eighth square. It is empty save for two rocks in the
 middle. One has the number {num} carved into it. The other has a lever
 sticking out of it."""
@@ -1026,7 +1026,7 @@ def puzzle_trigger_one(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[0] = True;
+    state.puzzle_check_move(1)
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1036,7 +1036,7 @@ def puzzle_trigger_two(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[1] = True;
+    state.puzzle_triggered[1] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1046,7 +1046,7 @@ def puzzle_trigger_three(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[2] = True;
+    state.puzzle_triggered[2] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1056,7 +1056,7 @@ def puzzle_trigger_four(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[3] = True;
+    state.puzzle_triggered[3] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1066,7 +1066,7 @@ def puzzle_trigger_five(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[4] = True;
+    state.puzzle_triggered[4] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1076,7 +1076,7 @@ def puzzle_trigger_six(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[5] = True;
+    state.puzzle_triggered[5] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1086,7 +1086,7 @@ def puzzle_trigger_seven(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[6] = True;
+    state.puzzle_triggered[6] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
@@ -1096,7 +1096,7 @@ def puzzle_trigger_eight(state):
 at the base. You you wait a second in silence before returning to the
 center section"""
     print(print_msg)
-    state.puzzle_triggered[7] = True;
+    state.puzzle_triggered[7] = True
     hld = str(input(""))
     os.system('cls' if os.name == 'nt' else 'clear')
     return state.current_scene, Scenes.FOREST_PUZZLE_CENTER
