@@ -101,6 +101,8 @@ class State:
         self.puzzle_triggered = [False, False, False, False, False, False, False, False]
         self.puzzle_sections = ["1", "2", "3", "4", "5", "6", "7", "8"]
         self.puzzle_stuff = {
+                'init': True,
+                'win': False,
                 'arr': [[0] * PUZZ_COL for _ in range(PUZZ_ROW)],
                 'triggered': [False, False, False, False, False, False, False, False],
                 'sections': ["1", "2", "3", "4", "5", "6", "7", "8"],
@@ -380,12 +382,13 @@ class State:
         self.current_scene = scene
 
     def reset_board(self):
+        for i in self.puzzle_stuff['triggered']:
+            i = False
         for i in range(0, 2):
             random.seed(time.time())
             print(f"i: {i}")
             temp_sections = list(self.puzzle_stuff['sections'])
             for l in range(len(temp_sections)):
-                lf.puzzle_string = f'{self.puzzle_string}{temp_sections[temp_rand]}'
                 item = random.choice(temp_sections)
                 self.puzzle_stuff['arr'][i][l] = item
                 temp_sections.remove(item)
@@ -397,25 +400,32 @@ class State:
         self.puzzle_stuff['key'] = temp
         print(f"Key: {self.puzzle_stuff['key']}")
 
-    def puzzle_is_valid(self):
-
-        return True
-
     def puzzle_complete(self):
-        return self.puzzle_triggered.count(True) == 8
+        return self.puzzle_stuff['win']
 
     def section_number(self, section):
-        return self.puzzle_stuff['arr'][1][section]
+        return self.puzzle_stuff['arr'][1][section - 1]
 
     def puzzle_check_move(self, num):
+
+        order = self.puzzle_stuff['key'].index(f'{num}')
+        if order == 0:
+            print("first checked")
+            self.puzzle_stuff['triggered'][0] = True
+            return
         t = True
-        for i in range(1 , num):
+        for i in range(0 , order):
             if not self.puzzle_stuff['triggered'][i]:
                 t = False
         if not t:
+            print("failure")
             self.reset_board()
             return
-        t = self.puzzle_stuff['key'][]
+        print("pass")
+        if order == 7:
+            self.puzzle_stuff['win'] = True
+        self.puzzle_stuff['triggered'][order] = True
+
 
 
     def get_new_puzzle(self):
@@ -429,3 +439,6 @@ class State:
 
     def is_init_puzzle(self):
         return self.init_puzzle
+
+    def get_puzzle_stuff(self):
+        return self.puzzle_stuff
