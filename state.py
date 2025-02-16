@@ -280,6 +280,24 @@ class State:
             else:
                 print("not a valid input")
 
+    def get_inventory(self):
+        return self.inventory.get_inventory()
+
+    def use_inv_item(self, itemtype):
+        self.inventory.use_item(itemtype)
+        match itemtype:
+            case "Health Potion":
+                self.hp += 10;
+            case "Strength Potion":
+                self.hit_rate += 2;
+            case "Agility Potion":
+                self.attack += 2;
+            case "Defence Potion":
+                self.defence += 2;
+            case "Bread Hunk":
+                self.hp += 1;
+                
+
     def hp_dec(self,amt):
         self.hp -= amt
 
