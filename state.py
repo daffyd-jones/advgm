@@ -1,9 +1,9 @@
-#asdf
 import json
 from os import name
 import os
-from random import random
-from random import seed
+import time
+from random import random as rand
+from random import seed, choice
 import math
 from enum import Enum, auto
 
@@ -14,7 +14,7 @@ from inventory import Inventory
 # from scenes import Beginning
 
 PUZZ_ROW = 2
-PUZZ_COL = 7
+PUZZ_COL = 8
 
 def remfront(st):
     remain = st[1:]
@@ -97,9 +97,17 @@ class State:
         }
         self.init_puzzle = True
         # self.reset_puzzle = True
-        self.puzzle_arr = [[0]*PUZZ_COL]*PUZZ_ROW
+        self.puzzle_arr = [[0] * PUZZ_COL for _ in range(PUZZ_ROW)]
         self.puzzle_triggered = [False, False, False, False, False, False, False, False]
         self.puzzle_sections = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        self.puzzle_stuff = {
+                'init': True,
+                'win': False,
+                'arr': [[0] * PUZZ_COL for _ in range(PUZZ_ROW)],
+                'triggered': [False, False, False, False, False, False, False, False],
+                'sections': ["1", "2", "3", "4", "5", "6", "7", "8"],
+                'key': ""
+            }
         self.sceneMap = {
             Scenes.BEGINNING: getattr(scenes, 'beginning'),
             Scenes.ENTER_FOREST: getattr(scenes, 'enter_forest'),
@@ -179,15 +187,38 @@ class State:
                 f"atk: {self.hit_rate}\n"\
                 f'--------\n'
 
-    def play(self):
+    def play(self, start_scene):
         self.play_bool = True
         os.system('cls' if os.name == 'nt' else 'clear')
+        if start_scene != None:
+            key = next((scene for scene in Scenes if scene.value == start_scene), None)
+            self.current_scene = key
         while self.play_bool:
             if self.current_scene == Scenes.INVENTORY:
                 self.use_inventory()
             if self.current_scene == Scenes.MENU:
                 self.use_menu()
             self.current_scene, self.scene_hold = self.sceneMap[self.current_scene](self)
+            if self.current_scene == None:
+                return None
+                pass
+
+
+
+    def play_turn(self, current_scene):
+        # self.play_bool = True
+        #os.system('cls' if os.name == 'nt' else 'clear')
+        #if start_scene != None:
+        #    key = next((scene for scene in Scenes if scene.value == start_scene), None)
+        #    self.current_scene = key
+        #while self.play_bool:
+        # if self.current_scene == Scenes.INVENTORY:
+        #     self.use_inventory()
+        # if self.current_scene == Scenes.MENU:
+        #     self.use_menu()
+        return self.sceneMap[self.current_scene](self)
+        # if self.current_scene == None:
+        #     return None
 
 
 
@@ -269,13 +300,31 @@ class State:
             else:
                 print("not a valid input")
 
+    def get_inventory(self):
+        return self.inventory.get_inventory()
+
+    def use_inv_item(self, itemtype):
+        self.inventory.use_item(itemtype)
+        match itemtype:
+            case "Health Potion":
+                self.hp += 10;
+            case "Strength Potion":
+                self.hit_rate += 2;
+            case "Agility Potion":
+                self.attack += 2;
+            case "Defence Potion":
+                self.defence += 2;
+            case "Bread Hunk":
+                self.hp += 1;
+                
+
     def hp_dec(self,amt):
         self.hp -= amt
 
 
     def encounter(self, probOfAttack, encounterMap):
         if probOfAttack != 1:
-            num = random()
+            num = rand()
             if num < probOfAttack:
                 return True
         intro_txt = encounterMap['intro_txt']
@@ -284,19 +333,22 @@ class State:
         print(f"Encounter with {encounterMap['name']} ")
         print(f"")
         print(f"{ intro_txt }")
+        # input(": ")
         fight = True
         hp = encounterMap["hp"]
         attack = encounterMap["attack"]
-        coin = random()
+        coin = rand()
         you_turn = True
         if coin > 0.5:
             you_turn = False
         while fight:
+            input(": ")
+            os.system('cls' if os.name == 'nt' else 'clear')
             if you_turn:
                 you_turn = False
             else:
                 you_turn = True
-            msg = random() * 10
+            msg = rand() * 10
             print(f"{fight_txt[int(msg) % len(fight_txt)]}")
             str(input(": ")).upper()
             if you_turn:
@@ -308,20 +360,21 @@ class State:
                 pturn = True
                 while pturn:
                     response = str(input(": ")).upper()
+                    print("")
                     if response == "HEALTH":
                         pturn = False
-                        # self.use_health_potion()
+                        self.hp += 10
                         pass
                     elif response == "POWER":
                         pturn = False
-                        # self.use_power_up()
+                        self.hit_rate += 2
                         pass
                     elif response == "ATTACK":
                         pturn = False
                         c = 0
                         acc = 0
                         while c < 3:
-                            roll = int(random() * self.attack)
+                            roll = int(rand() * self.attack)
                             acc += roll
                             c += 1
                         print(f"your roll: {acc}")
@@ -334,12 +387,12 @@ class State:
                     else:
                         print("Not a valid response")
             else:
-                print(f"It is {encounterMap['name']}'s turn")
-                seed(random())
+                print(f"\nIt is {encounterMap['name']}'s turn")
+                seed(rand())
                 c = 0
                 acc = 0
                 while c < 3:
-                    roll = int(random() * attack)
+                    roll = int(rand() * attack)
                     acc += roll
                     c += 1
                 print(f"enemy roll: {acc}")
@@ -351,7 +404,8 @@ class State:
                 else:
                     print(f"{encounterMap['name']}'s attack missed")
             if self.hp <= 0:
-                print('you have died')
+                print('\nyou have died')
+                input(": ")
                 return False
             if hp <= 0:
                 print(f"you beat {encounterMap['name']}")
@@ -366,24 +420,51 @@ class State:
         self.current_scene = scene
 
     def reset_board(self):
-        for i in range(0,1):
-            temp_sections = self.puzzle_sections
+        for i in self.puzzle_stuff['triggered']:
+            i = False
+        for i in range(0, 2):
+            seed(time.time())
+            print(f"i: {i}")
+            temp_sections = list(self.puzzle_stuff['sections'])
             for l in range(len(temp_sections)):
-                temp_rand = math.floor((random() * len(temp_sections) - 1))
-                # self.puzzle_string = f'{self.puzzle_string}{temp_sections[temp_rand]}'
-                self.puzzle_arr[i][l] = temp_rand
-                del temp_sections[temp_rand]
-
-    def puzzle_is_valid(self):
-
-        return True
+                item = choice(temp_sections)
+                self.puzzle_stuff['arr'][i][l] = item
+                temp_sections.remove(item)
+        print(f"puzzle: {self.puzzle_stuff['arr']}")
+        temp = ''
+        for i in range(1, 9):
+            idx = self.puzzle_stuff['arr'][0].index(str(i))
+            temp += self.puzzle_stuff['arr'][1][idx]
+        self.puzzle_stuff['key'] = temp
+        print(f"Key: {self.puzzle_stuff['key']}")
 
     def puzzle_complete(self):
-        return self.puzzle_triggered.count(True) == 8
+        return self.puzzle_stuff['win']
 
     def section_number(self, section):
-        parts = self.puzzle_string.split("|")
-        return parts[1][int(parts[0][section])]
+        return self.puzzle_stuff['arr'][1][section - 1]
+
+    def puzzle_check_move(self, num):
+
+        order = self.puzzle_stuff['key'].index(f'{num}')
+        if order == 0:
+            print("first checked")
+            self.puzzle_stuff['triggered'][0] = True
+            return
+        t = True
+        for i in range(0 , order):
+            if not self.puzzle_stuff['triggered'][i]:
+                t = False
+        if not t:
+            print("failure")
+            self.reset_board()
+            return
+        print("pass")
+        if order == 7:
+            self.puzzle_stuff['win'] = True
+        self.puzzle_stuff['triggered'][order] = True
+
+
 
     def get_new_puzzle(self):
         return self.reset_puzzle
@@ -396,3 +477,6 @@ class State:
 
     def is_init_puzzle(self):
         return self.init_puzzle
+
+    def get_puzzle_stuff(self):
+        return self.puzzle_stuff

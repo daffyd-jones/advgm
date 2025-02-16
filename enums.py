@@ -1,4 +1,3 @@
-# asdf
 from enum import Enum, auto
 
 

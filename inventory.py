@@ -1,7 +1,3 @@
-#inv
-
-
-
 #   - Inventory Class
 #
 #   used to manage inventory
@@ -36,42 +32,38 @@
 class Inventory:
     def __init__(self):
         self.health_potion = 0
-        self.power_up = 0
+        self.strength_potion = 0
+        self.agility_potion = 0
+        self.defence_potion = 0
+        self.bread_hunk = 0
 
     def __str__(self) -> str:
         return  f"1 - health potions: {self.health_potion}\n" \
                 f"2 - power ups: {self.power_up}"
 
-    def set_health(self, amt):
-        self.health_potion = amt
+    def use_item(self, item):
+        match item:
+            case "Health Potion":
+                self.health_potion -= 1;
+            case "Strength Potion":
+                self.strength_potion -= 1;
+            case "Agility Potion":
+                self.agility_potion -= 1;
+            case "Defence Potion":
+                self.defence_potion -= 1;
+            case "Bread Hunk":
+                self.bread_hunk -= 1;
 
-    def set_powerup(self, amt):
-        self.power_up = amt
-
-    def health_check(self):
+    def get_inventory(self):
+        out = []
         if self.health_potion > 0:
-            return True
-        return False
-
-    def power_check(self):
-        if self.power_up > 0:
-            return True
-        return False
-
-    def health_potion_amt(self):
-        return self.health_potion
-
-    def power_up_amt(self):
-        return self.power_up
-
-    def add_health_potion(self):
-        self.health_potion += 1
-
-    def use_health_potion(self):
-        self.health_potion -= 1
-
-    def add_power_up(self):
-        self.power_up += 1
-
-    def use_power_up(self):
-        self.power_up -= 1
+            out.append(f'Health Potion: {self.health_potion}')
+        if self.bread_hunk > 0:
+            out.append(f'Bread Hunk: {self.bread_hunk}')
+        if self.stength_potion > 0:
+            out.append(f'Strength Potion: {self.stength_potion}')
+        if self.agility_potion > 0:
+            out.append(f'Agility Potion: {self.agility_potion}')
+        if self.defence_potion > 0:
+            out.append(f'Defence Potion: {self.defence_potion}')
+        return out 

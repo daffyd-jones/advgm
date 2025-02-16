@@ -1,0 +1,113 @@
+Vertical {
+    # padding: 2;
+    position: relative;
+    # height: 100%;
+}
+Container {
+    position: relative;
+    height: 100%;
+    padding: 0 1;
+}
+Markdown {
+    position: relative;
+    padding: 2;
+}
+#top-horz {
+    padding: 1 0;
+    # position: relative;
+}
+
+#md-tl {
+    height: 100%;
+    width: 70%;
+}
+
+#md-bl {
+    height: 100%;
+    width: 70%;
+}
+
+#md-tr {
+    height: 40%;
+}
+
+#md-br {
+    height: 60%;
+}
+
+#opt-hor {
+    position: relative;
+    # padding: 1 1;
+}
+
+#button-grid {
+    layout: grid;
+    grid-size: 2;
+    width: 30%;
+}
+
+Button {
+    height: 100%;
+    width: 100%;
+}
+
+#lvert {
+    width: 75%;
+}
+
+#scene-img {
+    width: auto;
+	# background: blue;
+	# border: round $primary;
+	content-align: center middle;
+}
+
+#simg-cont {
+	margin: 0 1;
+	padding: 1 1;
+    background: $surface;
+	height: 60%;
+	width: 100%;
+	align: center middle;
+}
+
+#map-img {
+    width: auto;
+	# background: blue;
+	# border: round $background;
+	content-align: center middle;
+}
+
+#map-cont {
+	margin: 0 1;
+	padding: 1 1;
+    background: $surface;
+	# height: 60%;
+	# width: 100%;
+	align: center middle;
+}
+
+#scene-horz {
+    height: 70%;
+    
+}
+
+#ply-stat{
+    height: 100%;
+    width: 100%;
+    margin: 1 1;
+}
+
+Tabs {
+	width: auto;
+}
+
+#tab-content {
+	margin: 0 1;
+	padding: 1 1;
+    # background: $surface;
+	height: 100%;
+	# width: 100%;
+	# align: center middle;
+}
+
