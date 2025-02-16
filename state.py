@@ -2,8 +2,8 @@ import json
 from os import name
 import os
 import time
-import random
-from random import seed
+from random import random as rand
+from random import seed, choice
 import math
 from enum import Enum, auto
 
@@ -187,9 +187,12 @@ class State:
                 f"atk: {self.hit_rate}\n"\
                 f'--------\n'
 
-    def play(self):
+    def play(self, start_scene):
         self.play_bool = True
         os.system('cls' if os.name == 'nt' else 'clear')
+        if start_scene != None:
+            key = next((scene for scene in Scenes if scene.value == start_scene), None)
+            self.current_scene = key
         while self.play_bool:
             if self.current_scene == Scenes.INVENTORY:
                 self.use_inventory()
@@ -199,6 +202,23 @@ class State:
             if self.current_scene == None:
                 return None
                 pass
+
+
+
+    def play_turn(self, current_scene):
+        # self.play_bool = True
+        #os.system('cls' if os.name == 'nt' else 'clear')
+        #if start_scene != None:
+        #    key = next((scene for scene in Scenes if scene.value == start_scene), None)
+        #    self.current_scene = key
+        #while self.play_bool:
+        # if self.current_scene == Scenes.INVENTORY:
+        #     self.use_inventory()
+        # if self.current_scene == Scenes.MENU:
+        #     self.use_menu()
+        return self.sceneMap[self.current_scene](self)
+        # if self.current_scene == None:
+        #     return None
 
 
 
@@ -286,7 +306,7 @@ class State:
 
     def encounter(self, probOfAttack, encounterMap):
         if probOfAttack != 1:
-            num = random()
+            num = rand()
             if num < probOfAttack:
                 return True
         intro_txt = encounterMap['intro_txt']
@@ -299,7 +319,7 @@ class State:
         fight = True
         hp = encounterMap["hp"]
         attack = encounterMap["attack"]
-        coin = random()
+        coin = rand()
         you_turn = True
         if coin > 0.5:
             you_turn = False
@@ -310,7 +330,7 @@ class State:
                 you_turn = False
             else:
                 you_turn = True
-            msg = random() * 10
+            msg = rand() * 10
             print(f"{fight_txt[int(msg) % len(fight_txt)]}")
             str(input(": ")).upper()
             if you_turn:
@@ -336,7 +356,7 @@ class State:
                         c = 0
                         acc = 0
                         while c < 3:
-                            roll = int(random() * self.attack)
+                            roll = int(rand() * self.attack)
                             acc += roll
                             c += 1
                         print(f"your roll: {acc}")
@@ -350,11 +370,11 @@ class State:
                         print("Not a valid response")
             else:
                 print(f"\nIt is {encounterMap['name']}'s turn")
-                seed(random())
+                seed(rand())
                 c = 0
                 acc = 0
                 while c < 3:
-                    roll = int(random() * attack)
+                    roll = int(rand() * attack)
                     acc += roll
                     c += 1
                 print(f"enemy roll: {acc}")
@@ -385,11 +405,11 @@ class State:
         for i in self.puzzle_stuff['triggered']:
             i = False
         for i in range(0, 2):
-            random.seed(time.time())
+            seed(time.time())
             print(f"i: {i}")
             temp_sections = list(self.puzzle_stuff['sections'])
             for l in range(len(temp_sections)):
-                item = random.choice(temp_sections)
+                item = choice(temp_sections)
                 self.puzzle_stuff['arr'][i][l] = item
                 temp_sections.remove(item)
         print(f"puzzle: {self.puzzle_stuff['arr']}")

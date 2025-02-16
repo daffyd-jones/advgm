@@ -1104,24 +1104,57 @@ center section"""
     return Scenes.FOREST_PUZZLE_CENTER, Scenes.FOREST_PUZZLE_CENTER
 
 def forest_mountain_path(state):
-    print_msg = """You find yourself on a path that connects the forest puzzle with the
-base of the mountain"""
-    choice_msg = """where to go?\nforest PUZZLE\nmountain BASE"""
-    print(print_msg)
+    print_msg = ""
+    if state.puzzle_complete():
+        print_msg = """You find yourself on a path that leads from the base of the mountain
+into the forest. A feild extends from the wild forest to the shadow of the
+mountain's base. The bushes and trees steadily grow more numerous as the feild
+gradually turns into a dense tangle of growth. Would you like to go towards the
+mountain base, or venture into the forest?"""
+        choice_msg = """where to go?\nenter FOREST\nmountain BASE"""
+        print(print_msg)
+        print(choice_msg)
+        return get_input(
+            state.current_scene,
+            {
+                'PUZZLE': Scenes.FOREST_PUZZLE,
+                'BASE': Scenes.MOUNTAIN_BASE
+            },
+            "PUZZLE, BASE"
+        )
+    else:
+        print_msg = """You find yourself on a path that leads from the base of the mountain
+into the forest. A feild extends from the wild forest to the shadow of the
+mountain's base. The bushes and trees steadily grow more numerous as the feild
+gradually turns into a dense tangle of growth. Would you like to go towards the
+mountain base, or venture into the forest?"""
+        choice_msg = """where to go?\nenter FOREST\nmountain BASE"""
+        print(print_msg)
+        print(choice_msg)
+        response = str(input(": ")).upper()
+        response.strip()
+        if response == "FOREST":
+            forest_msg = """You enter the forest and manuver your way through the trees.
+as you continue the trees and growth become overwhelming and you become lost.
+After some aimless wandering, you find that the growth begins to thin. As you
+round a large rock you look up and see the mountain. You look around, you seem
+to be in the same feild that you were in previously. It seems you cannot enter
+the forest at this time."""
+    choice_msg = """where to go?\nmountain BASE"""
+    print(forest_msg)
     print(choice_msg)
     return get_input(
         state.current_scene,
         {
-            'PUZZLE': Scenes.FOREST_PUZZLE,
             'BASE': Scenes.MOUNTAIN_BASE
         },
-        "PUZZLE, BASE"
+        "BASE"
     )
 
 def mountain_path_1(state):
-    print_msg = """You find yourself on a path that connects the clearing with the
-mountain path."""
-    choice_msg = """Where to go?\nback to CLEARING\nto mountian PATH"""
+    print_msg = """You walk along a path that extends from the clearing you woke up in
+towards the base of the mountain. The path is bordered on both side by rough overgrowth."""
+    choice_msg = """Where to go?\ntowards CLEARING\nto mountian PATH"""
     print(print_msg)
     print(choice_msg)
     return get_input(
@@ -1135,7 +1168,7 @@ mountain path."""
 
 def mountain_path_2(state):
     win = state.encounter(
-        probOfAttack = 0.4,
+        probOfAttack = 0.1,
         encounterMap = {
             'name': 'racoon man',
             'hp': 20,

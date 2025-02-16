@@ -1,8 +1,13 @@
 from state import State
 import os
+import sys
 def main():
     # p = Player()
     play = True
+    scene = None
+    if len(sys.argv) > 1:
+        scene = sys.argv[1]
+
     while play:
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Welcome to VALLEY QUEST!!!")
@@ -17,7 +22,7 @@ def main():
         play = str(input(": ")).upper()
         if play == "Y":
             state = State()
-            state.play()
+            state.play(scene)
         else:
             print("Ok bye")
             break
