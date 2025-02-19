@@ -1,6 +1,6 @@
 
 # import enums
-from enums import Scenes, InvItem
+from enums import Scenes, SceneProp, InvItem
 from os import name
 import os
 import time
@@ -14,17 +14,17 @@ mountain, cold and grey against the bright sky. It cast the forest and the
 clearing below in shadow.""",
     SceneProp.CHOICE_MSG: """What do you want to do?\nWalk towards MOUNTAIN\nExplore FOREST\nLook at POND""",
     SceneProp.OPTIONS: {
-        'MOUNTAIN': Scenes.MOUNTAIN_PATH,
+        'MOUNTAIN': Scenes.MOUNTAIN_PATH_1,
         'FOREST': Scenes.ENTER_FOREST,
         'POND': Scenes.POND_APPROACH
     }
 }
 
-BEGINNING2 = {
+CLEARING = {
     SceneProp.SCENE_MSG: """You stand in the center of the clearing that you awoke in""",
     SceneProp.CHOICE_MSG: """What do you want to do?\nWalk towards MOUNTAIN\nExplore FOREST\nLook at POND""",
     SceneProp.OPTIONS: {
-        'MOUNTAIN': Scenes.MOUNTAIN_PATH,
+        'MOUNTAIN': Scenes.MOUNTAIN_PATH_1,
         'FOREST': Scenes.ENTER_FOREST,
         'POND': Scenes.POND_APPROACH
     }
@@ -43,7 +43,7 @@ a rock to your left.""",
     }
 }
 
-THROWROCK = {
+POND_THROWROCK = {
     SceneProp.SCENE_MSG: """You stoop to pick up the rock and raise it above your head. You
 throw the rock with into the center of the pond with substantial force. It
 bursts through the water with a loud splunk sound.\nYou wait for a moment.
@@ -311,7 +311,6 @@ POND_CAVE_20 = {
     SceneProp.OPTIONS: {
         'ENTRANCE': Scenes.MOUNTAIN_CAVE_ENTRANCE,
         '19': Scenes.POND_CAVE_19,
-
     }
 }
 
@@ -330,7 +329,7 @@ barely in view. """,
     }
 }
 
-FOR_PATH = {
+FOREST_PATH = {
     SceneProp.SCENE_MSG: """Leaving the clearing behind, you walk towards the path
 and follow it deeper into the forest. The forest grows more and more dense,
 blocking out the sun. As the forest around you becomes darker, you notice a
@@ -353,10 +352,10 @@ traveller, may the forests glowing light bless your journeyed soul'. 'Your
 arrival is most oppourtune, we are celebrating the light cycle this
 evening. You will be our honoured guest'. 'My name is Gladion. If you wish
 please follow me and I will see that you are fed and washed, you stink of
-the world beyond the forest and must be cleansed'."""
+the world beyond the forest and must be cleansed'.""",
     SceneProp.CHOICE_MSG: "CONTINUE",
     SceneProp.OPTIONS: {
-        'CONTINUE': Scenes.LIGHT_VILLAGE,
+        'CONTINUE': Scenes.LIGHT_VILLAGE_1,
     }
 }
 
@@ -437,12 +436,12 @@ outside when you are done.' You call to them as they turn to leave, 'Wait,
 what's your name?' They turn to you and smile, looking you over again.""",
     SceneProp.CHOICE_MSG: "CONTINUE",
     SceneProp.OPTIONS: {
-        'CONTINUE': Scenes.CEREMONY_OF_LIGHT,
+        'CONTINUE': Scenes.CEREMONY_OF_LIGHT_1,
     }
 }
 
 
-CEREMONY_OF_LIGHT = {
+CEREMONY_OF_LIGHT_1 = {
     SceneProp.SCENE_MSG: """You sit on the ground on the center of the village with
 the others, the excitement in the air sizzles around you. At the middle of
 the village center sits a roaring fire, its warmth bathes the village and
@@ -556,7 +555,7 @@ FOREST_CAVE_CLEARING_OUT = {
     }
 }
 
-FOREST_CAVE_ENTERANCE_IN = { 
+FOREST_CAVE_ENTRANCE_IN = { 
     SceneProp.SCENE_MSG: """Going feet first you lower yourself into the opening.
 Using the roots of the tree you lower yourself into an underground chamber.
 Light peeks in from cracks in the rock and the hole you just climbed
@@ -574,7 +573,7 @@ water. In the dim light of the cave you cant see much.""",
     }
 }
 
-FOREST_CAVE_ENTERANCE_OUT = { 
+FOREST_CAVE_ENTRANCE_OUT = { 
     SceneProp.SCENE_MSG: """Pull yourself out of pool.\ncrystal cavern\nPool behind you, hole
 that lights coming in through""",
     SceneProp.CHOICE_MSG: """What would you like to do?\nJUMP in the pool\nclimb out of the HOLE""",
@@ -593,7 +592,7 @@ bridge ahead continues downward again until it levels with the ground.""",
     SceneProp.CHOICE_MSG: """Where to go?\ngo back to BACKWOODS\ncontinue to PUZZLE""",
     SceneProp.OPTIONS: {
         'BACKWOODS': Scenes.BACKWOODS,
-        'PUZZLE': Scenes.FOREST_PUZZLE_CENTER
+        # 'PUZZLE': Scenes.FOREST_PUZZLE_CENTER
     }
 }
 
@@ -612,7 +611,7 @@ MOUNTAIN_PATH_2 = {
 of the mountain""",
     SceneProp.CHOICE_MSG: """where to go?\ngo to mountain PATH\ngo to BASE of the mountain""",
     SceneProp.OPTIONS: {
-        'PATH': Scenes.MOUNTAIN_PATH,
+        'PATH': Scenes.MOUNTAIN_PATH_1,
         'BASE': Scenes.MOUNTAIN_BASE,
     }
 }
@@ -623,32 +622,33 @@ MOUNTAIN_BASE = {
     SceneProp.OPTIONS: {
         'BACK': Scenes.MOUNTAIN_PATH_2,
         'ENTRANCE': Scenes.MOUNTAIN_ENTRANCE,
-        'FOREST': Scenes.FOREST_MOUTAIN_PATH
+        # 'FOREST': Scenes.FOREST_MOUTAIN_PATH
+        'FOREST': Scenes.BACKWOODS
     }
 }
 
-MOUNTAIN_ENTERANCE = {
-    """Mountain entrance\nconnects mountain base to m_LVL1_R1\nencounter here""",
-    """where go?\nmountain BASE\nto LVL1""",
-    {
+MOUNTAIN_ENTRANCE = {
+    SceneProp.SCENE_MSG: """Mountain entrance\nconnects mountain base to m_LVL1_R1\nencounter here""",
+    SceneProp.CHOICE_MSG: """where go?\nmountain BASE\nto LVL1""",
+    SceneProp.OPTIONS: {
         'BASE': Scenes.MOUNTAIN_BASE,
         'LVL1': Scenes.M_LVL1_R1
     }
 }
 
 M_LVL1_R1 = {
-    """first room on the first floor\ncurrently connects to LVL1Stairs through mountain cave entrance\nalso connects to mountain entrance""",
-    """where?\nmountain ENTRANCE\nto MCAVE""",
-    {
+    SceneProp.SCENE_MSG: """first room on the first floor\ncurrently connects to LVL1Stairs through mountain cave entrance\nalso connects to mountain entrance""",
+    SceneProp.CHOICE_MSG: """where?\nmountain ENTRANCE\nto MCAVE""",
+    SceneProp.OPTIONS: {
         'ENTRANCE': Scenes.MOUNTAIN_ENTRANCE,
         'MCAVE': Scenes.MOUNTAIN_CAVE_ENTRANCE
     }
 }
 
 MOUNTAIN_CAVE_ENTRANCE = {
-    """Mountain cave entrance\nmountain entrance to underwater cave\nalso connects LVL1 R1 and LVL1 Stairs""",
-    """where?\nto LVL1\nto CAVE\nto USTAIRS lvl1 stairs""",
-    {
+    SceneProp.SCENE_MSG: """Mountain cave entrance\nmountain entrance to underwater cave\nalso connects LVL1 R1 and LVL1 Stairs""",
+    SceneProp.CHOICE_MSG: """where?\nto LVL1\nto CAVE\nto USTAIRS lvl1 stairs""",
+    SceneProp.OPTIONS: {
         'LVL1': Scenes.M_LVL1_R1,
         'CAVE': Scenes.POND_CAVE_16,
         'USTAIRS': Scenes.M_LVL1_STAIRS
@@ -656,54 +656,54 @@ MOUNTAIN_CAVE_ENTRANCE = {
 }
 
 M_LVL1_STAIRS = {
-    """lvl1 stairs\nconnects lvl1 and lvl2\ncurrently goes from mountain cave entrance to LVL2 R1""",
-    """where?\nto MCAVE\nto LVL2""",
-    {
+    SceneProp.SCENE_MSG: """lvl1 stairs\nconnects lvl1 and lvl2\ncurrently goes from mountain cave entrance to LVL2 R1""",
+    SceneProp.CHOICE_MSG: """where?\nto MCAVE\nto LVL2""",
+    SceneProp.OPTIONS: {
         'MCAVE': Scenes.MOUNTAIN_CAVE_ENTRANCE,
         'LVL2': Scenes.M_LVL2_R1
     }
 }
 
 M_LVL2_R1 = { 
-    """mountain LVL 2\nconnects to LVL1STAIRS and LVL2Stairs"""
-    """where?\ngo USTAIRS staircase to lvl3\ngo DSTAIRS staircase to lvl1"""
-    {
+    SceneProp.SCENE_MSG: """mountain LVL 2\nconnects to LVL1STAIRS and LVL2Stairs""",
+    SceneProp.CHOICE_MSG: """where?\ngo USTAIRS staircase to lvl3\ngo DSTAIRS staircase to lvl1""",
+    SceneProp.OPTIONS: {
         'DSTAIRS': Scenes.M_LVL1_STAIRS,
         'USTAIRS': Scenes.M_LVL2_STAIRS
     }
 }
 
 M_LVL2_STAIRS = {
-    """mountain lvl2 stairs to lvl 3\nconnects lvl2 to lvl3"""
-    """where?\nto LVL2\nto LVL3"""
-    {
+    SceneProp.SCENE_MSG: """mountain lvl2 stairs to lvl 3\nconnects lvl2 to lvl3""",
+    SceneProp.CHOICE_MSG: """where?\nto LVL2\nto LVL3""",
+    SceneProp.OPTIONS: {
         'LVL2': Scenes.M_LVL2_R1,
         'LVL3': Scenes.M_LVL3_R1
     }
 }
 
 M_LVL3_R1 = {
-    """mountain lvl 3\nconnects to lvl2 stairs and lvl3stairs to boss"""
-    """Where?\nto DSTAIRS staircase to lvl2\nto USTAIRS staircase to lvl3"""
-    {
+    SceneProp.SCENE_MSG: """mountain lvl 3\nconnects to lvl2 stairs and lvl3stairs to boss""",
+    SceneProp.CHOICE_MSG: """Where?\nto DSTAIRS staircase to lvl2\nto USTAIRS staircase to lvl3""",
+    SceneProp.OPTIONS: {
         'DSTAIRS': Scenes.M_LVL2_STAIRS,
         'USTAIRS': Scenes.M_LVL3_STAIRS
     }
 }
 
 M_LVL3_STAIRS = { 
-    """mountain lvl 3 stairs\nconnect lvl3 with boss area"""
-    """where?\nto LVL3\nUP to boss area"""
-    {
+    SceneProp.SCENE_MSG: """mountain lvl 3 stairs\nconnect lvl3 with boss area""",
+    SceneProp.CHOICE_MSG: """where?\nto LVL3\nUP to boss area""",
+    SceneProp.OPTIONS: {
         'LVL3': Scenes.M_LVL3_R1,
         'UP': Scenes.BOSS_AREA
     }
 }
 
 BOSS_AREA = { 
-    """Boss area\nwhere final encounter will take place\ngoes only back to LVL3 stairs"""
-    """where?\nBACK down stairs"""
-    {
+    SceneProp.SCENE_MSG: """Boss area\nwhere final encounter will take place\ngoes only back to LVL3 stairs""",
+    SceneProp.CHOICE_MSG: """where?\nBACK down stairs""",
+    SceneProp.OPTIONS: {
         'BACK': Scenes.M_LVL3_STAIRS
     }
 }

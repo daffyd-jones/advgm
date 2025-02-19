@@ -4,7 +4,7 @@ from state import State
 from rich_pixels import Pixels
 from textual.app import App, ComposeResult
 from textual.containers import Container, VerticalScroll, Horizontal, Vertical, Grid, Center
-from textual.widgets import Static, Footer, Header, Markdown, Rule, Button, Tabs, Tab
+from textual.widgets import Static, Footer, Header, Markdown, Rule, Button, Tabs, Tab, ListView, ListItem, ContentSwitcher
 
 aa = '''
 ;lksadjf;oio weoifhwoihekl ahekjh asd asd effef  fsd.
@@ -125,6 +125,31 @@ class AdventureGui(App):
 
     def compose(self):
         yield Header()
+        with ContentSwitcher(initial="menu-screen"):
+            yield GameScreen(id="game-screen")
+            with Center(id="menu-screen"):
+                yield ListView(
+                    ListItem(Button("New Game", id="menu-new")),
+                    ListItem(Button("Load Game", id="menu-load")),
+                    ListItem(Button("Save Game", id="menu-save")),
+                    ListItem(Button("Exit Game", id="menu-exit")),
+                    id="menu-list"
+                )
+        yield Footer()
+
+    def on_mount(self) -> None:
+        # start_turn = self.state.play_turn(Scenes.BEGINNING)
+        pass
+        
+    
+    def on_putton_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == '#menu-new':
+            self.query_one(ContentSwitcher).current = "#game-screen"
+  
+
+class GameScreen(Static):
+
+    def compose(self):
         with Horizontal(id="top-horz"):
             with Vertical(id="lvert"):
                 with Container():
@@ -152,21 +177,12 @@ class AdventureGui(App):
                     # yield Markdown(id="md-br")
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     yield Markdown("", id="tab-content")
-        yield Footer()
-
-    def on_mount(self) -> None:
-        # start_turn = self.state.play_turn(Scenes.BEGINNING)
-        pass
-        
-    
-    def on_putton_pressed(self, event: Button.Pressed) -> None:
-        pass            
-    
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         tab_content = self.query_one("#tab-content")
         tab_idx = TABS.index(f'{event.tab.label}')
         tab_content.update(TAB_CONT[tab_idx])
+
 
 class MapRender(Static):
 
@@ -179,6 +195,16 @@ class SceneRender(Static):
     def on_mount(self) -> None:
         map_img = Pixels.from_image_path("profile32.png")
         self.update(map_img)
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app = AdventureGui()

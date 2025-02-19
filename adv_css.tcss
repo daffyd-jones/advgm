@@ -1,3 +1,27 @@
+Center {
+    border: solid red;
+    height: 100%;
+}
+
+Button {
+    border: solid yellow;
+    # height: 25%;
+}
+
+ListItem {
+    height: 25%;
+}
+
+#menu-screen {
+    border: solid orange;
+    height: 100%;
+}
+
+#menu-list {
+    border: solid green;
+    height: 100%;
+}
+
 Vertical {
     # padding: 2;
     position: relative;
