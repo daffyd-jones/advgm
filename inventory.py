@@ -1,3 +1,5 @@
+from enums import InvItem
+
 #   - Inventory Class
 #
 #   used to manage inventory
@@ -43,15 +45,15 @@ class Inventory:
 
     def use_item(self, item):
         match item:
-            case "Health Potion":
+            case InvItem.HEALTH_POTION:
                 self.health_potion -= 1;
-            case "Strength Potion":
+            case InvItem.STRENGTH_POTION:
                 self.strength_potion -= 1;
-            case "Agility Potion":
+            case InvItem.AGILITY_POTION:
                 self.agility_potion -= 1;
-            case "Defence Potion":
+            case InvItem.DEFENCE_POTION:
                 self.defence_potion -= 1;
-            case "Bread Hunk":
+            case InvItem.BREAD_HUNK:
                 self.bread_hunk -= 1;
 
     def get_inventory(self):
@@ -66,4 +68,18 @@ class Inventory:
             out.append(f'Agility Potion: {self.agility_potion}')
         if self.defence_potion > 0:
             out.append(f'Defence Potion: {self.defence_potion}')
-        return out 
+        return out
+
+    def add_item(self, item):
+        match item:
+            case InvItem.HEALTH_POTION:
+                self.health_potion += 1;
+            case InvItem.STRENGTH_POTION:
+                self.strength_potion += 1;
+            case InvItem.AGILITY_POTION:
+                self.agility_potion += 1;
+            case InvItem.DEFENCE_POTION:
+                self.defence_potion += 1;
+            case InvItem.BREAD_HUNK:
+                self.bread_hunk += 1;
+        

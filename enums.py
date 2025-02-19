@@ -1,10 +1,16 @@
 from enum import Enum, auto
 
-
+class SceneProp(Enum):
+    SCENE_MSG = auto()
+    CHOICE_MSG = auto()
+    OPTIONS = auto()
 
 class InvItem(Enum):
     HEALTH_POTION = auto()
-    POWER_UP = auto()
+    STRENGTH_POTION = auto()
+    AGILITY_POTION = auto()
+    DEFENCE_POTION = auto()
+    BREAD_HUNK = auto()
 
 # - Scenes Enum
 #

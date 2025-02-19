@@ -92,8 +92,8 @@ class State:
         self.scene_hold = Scenes.BEGINNING
         self.inventory = Inventory()
         self.inv_prize = {
-            InvItem.HEALTH_POTION: self.inventory.add_health_potion(),
-            InvItem.POWER_UP: self.inventory.add_power_up()
+            InvItem.HEALTH_POTION: self.inventory.add_item(InvItem.HEALTH_POTION),
+            InvItem.STRENGTH_POTION: self.inventory.add_item(InvItem.STRENGTH_POTION)
         }
         self.init_puzzle = True
         # self.reset_puzzle = True

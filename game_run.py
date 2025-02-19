@@ -1,5 +1,5 @@
 # run game with gui
-
+from enums import Scenes, InvItem
 from state import State
 from rich_pixels import Pixels
 from textual.app import App, ComposeResult
@@ -129,14 +129,14 @@ class AdventureGui(App):
             with Vertical(id="lvert"):
                 with Container():
                     with Horizontal(id="scene-horz"):
-                        yield Markdown(cc, id="md-tl")
+                        yield Markdown(id="md-tl")
                         with Vertical():
                             with Static(id="simg-cont"):
                                 yield SceneRender(id="scene-img")
                             yield Markdown(stats, id="ply-stat")
                     yield Rule()
                     with Horizontal(id="opt-hor"):
-                        yield Markdown(bb, id="md-bl")
+                        yield Markdown(id="md-bl")
                         with Container(id="button-grid"):
                             yield Button()
                             yield Button()
@@ -153,6 +153,15 @@ class AdventureGui(App):
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     yield Markdown("", id="tab-content")
         yield Footer()
+
+    def on_mount(self) -> None:
+        # start_turn = self.state.play_turn(Scenes.BEGINNING)
+        pass
+        
+    
+    def on_putton_pressed(self, event: Button.Pressed) -> None:
+        pass            
+    
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         tab_content = self.query_one("#tab-content")
