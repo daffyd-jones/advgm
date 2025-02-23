@@ -1,5 +1,6 @@
 # run game with gui
-from enums import Scenes, InvItem
+from enums import Scenes, SceneProp, InvItem
+from textual.reactive import reactive
 from state import State
 from rich_pixels import Pixels
 from textual.app import App, ComposeResult
@@ -119,32 +120,39 @@ It could be an item that you take from a person, or a thing that is given to you
 
  
 class AdventureGui(App):
-    state = (State())
-
+    state = reactive(State())
+    current_scene = reactive(Scenes.BEGINNING)
+    scene_content = reactive({})
+    
     CSS_PATH = "adv_css.tcss"
 
     def compose(self):
-        yield Header()
+        # yield Header()
         with ContentSwitcher(initial="menu-screen"):
             yield GameScreen(id="game-screen")
             with Center(id="menu-screen"):
                 yield Vertical(
+                    # Markdown(id='mdbug'),
                     Button("New Game", id="menu-new", classes="menu-btn"),
                     Button("Load Game", id="menu-load", classes="menu-btn"),
                     Button("Save Game", id="menu-save", classes="menu-btn"),
                     Button("Exit Game", id="menu-exit", classes="menu-btn"),
                     id="menu-list"
                 )
-        yield Footer()
+        # yield Footer()
 
     def on_mount(self) -> None:
-        # start_turn = self.state.play_turn(Scenes.BEGINNING)
-        pass
+        start_turn = self.state.play_turn(self.current_scene)
+        self.query_one('#md-tl').update(start_turn[SceneProp.SCENE_MSG])
+        self.query_one('#md-bl').update(start_turn[SceneProp.CHOICE_MSG])
+        opts = start_turn[SceneProp.OPTIONS]
+        self.scene_content = start_turn
+        
         
     
-    def on_putton_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == '#menu-new':
-            self.query_one(ContentSwitcher).current = "#game-screen"
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == 'menu-new':
+            self.query_one(ContentSwitcher).current = "game-screen"
   
 
 class GameScreen(Static):
@@ -163,10 +171,10 @@ class GameScreen(Static):
                     with Horizontal(id="opt-hor"):
                         yield Markdown(id="md-bl")
                         with Container(id="button-grid"):
-                            yield Button(classes="opt-btn")
-                            yield Button(classes="opt-btn")
-                            yield Button(classes="opt-btn")
-                            yield Button(classes="opt-btn")
+                            yield Button("a", classes="opt-btn", id="btn-a")
+                            yield Button("b", classes="opt-btn", id="btn-b")
+                            yield Button("c", classes="opt-btn", id="btn-c")
+                            yield Button("d", classes="opt-btn", id="btn-d")
             with Vertical(id="rvert"):
                 with Container():
                     # yield Markdown(map_img, id="md-tr")
@@ -184,6 +192,10 @@ class GameScreen(Static):
         tab_content.update(TAB_CONT[tab_idx])
 
 
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == 'btn-a':
+            
+  
 class MapRender(Static):
 
     def on_mount(self) -> None:
