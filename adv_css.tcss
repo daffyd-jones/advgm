@@ -3,23 +3,26 @@ Center {
     height: 100%;
 }
 
-Button {
+.menu-btn {
     border: solid yellow;
-    # height: 25%;
+    height: 25%;
+    width: 100%;
 }
 
-ListItem {
-    height: 25%;
-}
+# ListItem {
+#     height: 25%;
+# }
 
 #menu-screen {
     border: solid orange;
-    height: 100%;
+    align: center middle;
+    # height: 100%;
 }
 
 #menu-list {
     border: solid green;
-    height: 100%;
+    height: 60%;
+    width: 40%;
 }
 
 Vertical {
@@ -70,7 +73,7 @@ Markdown {
     width: 30%;
 }
 
-Button {
+.opt-btn {
     height: 100%;
     width: 100%;
 }

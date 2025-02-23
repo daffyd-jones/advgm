@@ -128,11 +128,11 @@ class AdventureGui(App):
         with ContentSwitcher(initial="menu-screen"):
             yield GameScreen(id="game-screen")
             with Center(id="menu-screen"):
-                yield ListView(
-                    ListItem(Button("New Game", id="menu-new")),
-                    ListItem(Button("Load Game", id="menu-load")),
-                    ListItem(Button("Save Game", id="menu-save")),
-                    ListItem(Button("Exit Game", id="menu-exit")),
+                yield Vertical(
+                    Button("New Game", id="menu-new", classes="menu-btn"),
+                    Button("Load Game", id="menu-load", classes="menu-btn"),
+                    Button("Save Game", id="menu-save", classes="menu-btn"),
+                    Button("Exit Game", id="menu-exit", classes="menu-btn"),
                     id="menu-list"
                 )
         yield Footer()
@@ -163,10 +163,10 @@ class GameScreen(Static):
                     with Horizontal(id="opt-hor"):
                         yield Markdown(id="md-bl")
                         with Container(id="button-grid"):
-                            yield Button()
-                            yield Button()
-                            yield Button()
-                            yield Button()
+                            yield Button(classes="opt-btn")
+                            yield Button(classes="opt-btn")
+                            yield Button(classes="opt-btn")
+                            yield Button(classes="opt-btn")
             with Vertical(id="rvert"):
                 with Container():
                     # yield Markdown(map_img, id="md-tr")
