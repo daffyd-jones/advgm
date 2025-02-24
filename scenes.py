@@ -483,7 +483,7 @@ life, learning as we do.' But the struggle leaves scars and sores that sit
 deep down and ache and fester.""",
     SceneProp.CHOICE_MSG: "CONTINUE",
     SceneProp.OPTIONS: {
-        'CONTINUE': Scenes.LIGHT_VILLAGE_3,
+        'CONTINUE': Scenes.CEREMONY_OF_LIGHT_3,
     }
 }
 

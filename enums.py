@@ -4,6 +4,8 @@ class SceneProp(Enum):
     SCENE_MSG = auto()
     CHOICE_MSG = auto()
     OPTIONS = auto()
+    SCENE_IMG = auto()
+    MAP_IMG = auto()
 
 class InvItem(Enum):
     HEALTH_POTION = auto()

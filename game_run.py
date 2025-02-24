@@ -143,16 +143,59 @@ class AdventureGui(App):
 
     def on_mount(self) -> None:
         start_turn = self.state.play_turn(self.current_scene)
-        self.query_one('#md-tl').update(start_turn[SceneProp.SCENE_MSG])
-        self.query_one('#md-bl').update(start_turn[SceneProp.CHOICE_MSG])
-        opts = start_turn[SceneProp.OPTIONS]
         self.scene_content = start_turn
+        self.query_one('#md-tl').update(self.scene_content[SceneProp.SCENE_MSG])
+        self.query_one('#md-bl').update(self.scene_content[SceneProp.CHOICE_MSG])
+        opts = self.scene_content[SceneProp.OPTIONS]
+        keys = list(opts.keys())
+        kdiff = 4 - len(keys)
+        pad = [" "] * kdiff
+        fkeys = keys + pad
+        self.query_one('#btn-a').label = fkeys[0]
+        self.query_one('#btn-b').label = fkeys[1]
+        self.query_one('#btn-c').label = fkeys[2]
+        self.query_one('#btn-d').label = fkeys[3]
+        self.set_stats()
+
+
+    def set_stats(self) -> None:
+        stats = self.state.stats
         
+        stat_str = f"""
+|Stat|Amt|
+|---|---|
+|Health|{stats['hp']}|
+|Money|{stats['money']}|
+|Attack|{stats['attack']}|
+|Damage|{stats['hit_rate']}|
+|Defence|{stats['defence']}|
+"""
+        self.query_one('#ply-stat').update(stat_str)
+
+    def set_scene_img(self) -> None:
+        
+        scene_render = self.query_one('#scene-img')
         
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == 'menu-new':
-            self.query_one(ContentSwitcher).current = "game-screen"
+        match event.button.id:
+            case 'menu-new':
+                self.query_one(ContentSwitcher).current = "game-screen"
+            case 'btn-a' | 'btn-b' | 'btn-c' | 'btn-d':
+                label = self.query_one(f'#{event.button.id}').label
+                self.scene_content = self.state.play_turn(self.scene_content[SceneProp.OPTIONS][f'{label}'])
+                self.query_one('#md-tl').update(self.scene_content[SceneProp.SCENE_MSG])
+                self.query_one('#md-bl').update(self.scene_content[SceneProp.CHOICE_MSG])
+                opts = self.scene_content[SceneProp.OPTIONS]
+                keys = list(opts.keys())
+                kdiff = 4 - len(keys)
+                pad = [" "] * kdiff
+                fkeys = keys + pad
+                self.query_one('#btn-a').label = fkeys[0]
+                self.query_one('#btn-b').label = fkeys[1]
+                self.query_one('#btn-c').label = fkeys[2]
+                self.query_one('#btn-d').label = fkeys[3]
+                self.set_stats()
   
 
 class GameScreen(Static):
@@ -177,12 +220,9 @@ class GameScreen(Static):
                             yield Button("d", classes="opt-btn", id="btn-d")
             with Vertical(id="rvert"):
                 with Container():
-                    # yield Markdown(map_img, id="md-tr")
                     with Static(id="map-cont"):
                         yield MapRender(id="map-img")
-                        # yield Static("Hello World", id="map-img")
                     yield Rule()
-                    # yield Markdown(id="md-br")
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     yield Markdown("", id="tab-content")
 
@@ -193,19 +233,18 @@ class GameScreen(Static):
 
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == 'btn-a':
-            
+        pass
   
 class MapRender(Static):
 
     def on_mount(self) -> None:
-        map_img = Pixels.from_image_path("map32.png")
+        map_img = Pixels.from_image_path("imgs/maps/map_clearing_32.png")
         self.update(map_img)
 
 class SceneRender(Static):
 
     def on_mount(self) -> None:
-        map_img = Pixels.from_image_path("profile32.png")
+        map_img = Pixels.from_image_path("imgs/scenes/clearing_32.png")
         self.update(map_img)
 
 
