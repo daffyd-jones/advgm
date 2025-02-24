@@ -169,10 +169,6 @@ class State:
             'hit_rate': 5,
             'attack': 10
         }
-        # self.hp = 50
-        # self.defence = 10
-        # self.hit_rate = 5
-        # self.attack = 10
         self.current_scene = Scenes.BEGINNING
         self.scene_hold = Scenes.BEGINNING
         self.inventory = Inventory()
@@ -214,16 +210,16 @@ class State:
     def use_inv_item(self, itemtype):
         self.inventory.use_item(itemtype)
         match itemtype:
-            case "Health Potion":
-                self.hp += 10;
-            case "Strength Potion":
-                self.hit_rate += 2;
-            case "Agility Potion":
-                self.attack += 2;
-            case "Defence Potion":
-                self.defence += 2;
-            case "Bread Hunk":
-                self.hp += 1;
+            case InvItem.HEALTH_POTION:
+                self.stats['hp'] += 10;
+            case InvItem.STRENGTH_POTION:
+                self.stats['hit_rate'] += 2;
+            case InvItem.AGILITY_POTION:
+                self.stats['attack'] += 2;
+            case InvItem.DEFENCE_POTION:
+                self.stats['defence'] += 2;
+            case InvItem.BREAD_HUNK:
+                self.stats['hp'] += 1;
                 
     def hp_dec(self,amt):
         self.hp -= amt

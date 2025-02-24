@@ -144,6 +144,11 @@ class AdventureGui(App):
     def on_mount(self) -> None:
         start_turn = self.state.play_turn(self.current_scene)
         self.scene_content = start_turn
+        self.set_scene_content()
+        self.set_stats()
+        self.set_scene_imgs()
+
+    def set_scene_content(self) -> None:
         self.query_one('#md-tl').update(self.scene_content[SceneProp.SCENE_MSG])
         self.query_one('#md-bl').update(self.scene_content[SceneProp.CHOICE_MSG])
         opts = self.scene_content[SceneProp.OPTIONS]
@@ -155,12 +160,11 @@ class AdventureGui(App):
         self.query_one('#btn-b').label = fkeys[1]
         self.query_one('#btn-c').label = fkeys[2]
         self.query_one('#btn-d').label = fkeys[3]
-        self.set_stats()
+        
 
 
     def set_stats(self) -> None:
         stats = self.state.stats
-        
         stat_str = f"""
 |Stat|Amt|
 |---|---|
@@ -172,9 +176,13 @@ class AdventureGui(App):
 """
         self.query_one('#ply-stat').update(stat_str)
 
-    def set_scene_img(self) -> None:
-        
-        scene_render = self.query_one('#scene-img')
+    def set_scene_imgs(self) -> None:
+        img_path = self.scene_content[SceneProp.SCENE_IMG]
+        map_img = Pixels.from_image_path(img_path)
+        self.query_one('#scene-img').update(map_img)
+        img_path = self.scene_content[SceneProp.MAP_IMG]
+        map_img = Pixels.from_image_path(img_path)
+        self.query_one('#map-img').update(map_img)
         
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -184,18 +192,9 @@ class AdventureGui(App):
             case 'btn-a' | 'btn-b' | 'btn-c' | 'btn-d':
                 label = self.query_one(f'#{event.button.id}').label
                 self.scene_content = self.state.play_turn(self.scene_content[SceneProp.OPTIONS][f'{label}'])
-                self.query_one('#md-tl').update(self.scene_content[SceneProp.SCENE_MSG])
-                self.query_one('#md-bl').update(self.scene_content[SceneProp.CHOICE_MSG])
-                opts = self.scene_content[SceneProp.OPTIONS]
-                keys = list(opts.keys())
-                kdiff = 4 - len(keys)
-                pad = [" "] * kdiff
-                fkeys = keys + pad
-                self.query_one('#btn-a').label = fkeys[0]
-                self.query_one('#btn-b').label = fkeys[1]
-                self.query_one('#btn-c').label = fkeys[2]
-                self.query_one('#btn-d').label = fkeys[3]
+                self.set_scene_count()
                 self.set_stats()
+                self.set_scene_imgs()
   
 
 class GameScreen(Static):
@@ -238,14 +237,16 @@ class GameScreen(Static):
 class MapRender(Static):
 
     def on_mount(self) -> None:
-        map_img = Pixels.from_image_path("imgs/maps/map_clearing_32.png")
-        self.update(map_img)
+        # map_img = Pixels.from_image_path("imgs/maps/map_clearing_32.png")
+        # self.update(map_img)
+        pass
 
 class SceneRender(Static):
 
     def on_mount(self) -> None:
-        map_img = Pixels.from_image_path("imgs/scenes/clearing_32.png")
-        self.update(map_img)
+        # map_img = Pixels.from_image_path("imgs/scenes/clearing_32.png")
+        # self.update(map_img)
+        pass
 
 
 
