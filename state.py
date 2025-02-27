@@ -200,9 +200,9 @@ class State:
         return SCENE_MAP[current_scene]
 
     def level_up(self, hp, defence, attack):
-        self.hp = hp
-        self.defence = defence
-        self.attack = attack
+        self.stats['hp'] = hp
+        self.stats['defence'] = defence
+        self.stats['attack'] = attack
 
     def get_inventory(self):
         return self.inventory.get_inventory()

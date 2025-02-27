@@ -18,8 +18,8 @@ clearing below in shadow.""",
         'FOREST': Scenes.ENTER_FOREST,
         'POND': Scenes.POND_APPROACH
     },
-    SceneProp.SCENE_IMG: "profile32.png",
-    SceneProp.MAP_IMG: "map32.png",
+    SceneProp.SCENE_IMG: "imgs/scenes/clearing_32.png",
+    SceneProp.MAP_IMG: "imgs/maps/map_clearing_32.png",
 }
 
 CLEARING = {
@@ -30,8 +30,8 @@ CLEARING = {
         'FOREST': Scenes.ENTER_FOREST,
         'POND': Scenes.POND_APPROACH
     },
-    SceneProp.SCENE_IMG: "map32.png",
-    SceneProp.MAP_IMG: "profile32.png",
+    SceneProp.SCENE_IMG: "imgs/scenes/clearing_32.png",
+    SceneProp.MAP_IMG: "imgs/maps/map_clearing_32.png",
 }
 
 POND_APPROACH = {
@@ -45,8 +45,8 @@ a rock to your left.""",
         'JUMP': Scenes.POND_JUMP,
         'RETURN': Scenes.CLEARING
     },
-    SceneProp.SCENE_IMG: "map32.png",
-    SceneProp.MAP_IMG: "profile32.png",
+    SceneProp.SCENE_IMG: "imgs/scenes/pond_20.png",
+    SceneProp.MAP_IMG: "imgs/maps/map_clearing_32.png",
 }
 
 POND_THROWROCK = {
@@ -59,8 +59,8 @@ Nothing happens.""",
         'JUMP': Scenes.POND_JUMP,
         'RETURN': Scenes.CLEARING
     },
-    SceneProp.SCENE_IMG: "",
-    SceneProp.MAP_IMG: "",
+    SceneProp.SCENE_IMG: "imgs/scenes/",
+    SceneProp.MAP_IMG: "imgs/maps",
 }
 
 POND_JUMP = {

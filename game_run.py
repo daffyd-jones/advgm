@@ -128,8 +128,8 @@ class AdventureGui(App):
 
     def compose(self):
         # yield Header()
-        with ContentSwitcher(initial="menu-screen"):
-            yield GameScreen(id="game-screen")
+        with ContentSwitcher(initial="menu-screen", id="main-switch"):
+            yield GameScreen(self.state.get_inventory(), id="game-screen")
             with Center(id="menu-screen"):
                 yield Vertical(
                     # Markdown(id='mdbug'),
@@ -188,16 +188,21 @@ class AdventureGui(App):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
             case 'menu-new':
-                self.query_one(ContentSwitcher).current = "game-screen"
+                self.query_one('#main-switch').current = "game-screen"
             case 'btn-a' | 'btn-b' | 'btn-c' | 'btn-d':
                 label = self.query_one(f'#{event.button.id}').label
                 self.scene_content = self.state.play_turn(self.scene_content[SceneProp.OPTIONS][f'{label}'])
-                self.set_scene_count()
+                self.set_scene_content()
                 self.set_stats()
                 self.set_scene_imgs()
   
 
 class GameScreen(Static):
+
+    def __init__(self, inventory, id):
+        self.inventory = inventory
+        super().__init__(id=id)
+
 
     def compose(self):
         with Horizontal(id="top-horz"):
@@ -223,17 +228,49 @@ class GameScreen(Static):
                         yield MapRender(id="map-img")
                     yield Rule()
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
-                    yield Markdown("", id="tab-content")
+                    with ContentSwitcher(initial="inv-wig", id="tab-switch"):
+                        yield Inventory(self.inventory, id="inv-wig")
+                        # with Vertical(id="inv-vert"):
+                        #     yield Ma("", id="tab-content")
+                        yield Markdown("", id="tab-content")
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
-        tab_content = self.query_one("#tab-content")
-        tab_idx = TABS.index(f'{event.tab.label}')
-        tab_content.update(TAB_CONT[tab_idx])
-
+        match f'{event.tab.label}':
+            case 'Inventory':
+                self.query_one("#tab-switch").current = 'inv-wig'
+            case 'Notes':
+                self.query_one("#tab-switch").current = 'tab-content'
+                tab_idx = TABS.index(f'{event.tab.label}')
+                self.query_one("#tab-content").update(TAB_CONT[tab_idx])
+            case 'Awards':
+                self.query_one("#tab-switch").current = 'tab-content'
+                tab_idx = TABS.index(f'{event.tab.label}')
+                self.query_one("#tab-content").update(TAB_CONT[tab_idx])
+            case 'Experience':
+                self.query_one("#tab-switch").current = 'tab-content'
+                tab_idx = TABS.index(f'{event.tab.label}')
+                self.query_one("#tab-content").update(TAB_CONT[tab_idx])
+                
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         pass
   
+class Inventory(Static):
+
+    def __init__(self, inventory, id):
+        self.inventory = inventory
+        super().__init__(id=id)
+
+    def on_mount(self):
+       inv_list =  self.query_one("#inv-vert")
+       for i, item in enumerate(self.inventory):
+           id_str = f'inv-btn-{i + 1}'
+           inv_list.append(ListItem(Button(item, id=id_str)))
+
+    def compose(self):
+        yield ListView(id="inv-vert")
+            
+
 class MapRender(Static):
 
     def on_mount(self) -> None:

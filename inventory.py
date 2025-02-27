@@ -33,11 +33,11 @@ from enums import InvItem
 #
 class Inventory:
     def __init__(self):
-        self.health_potion = 0
-        self.strength_potion = 0
-        self.agility_potion = 0
-        self.defence_potion = 0
-        self.bread_hunk = 0
+        self.health_potion = 5
+        self.strength_potion = 5
+        self.agility_potion = 5
+        self.defence_potion = 5
+        self.bread_hunk = 5
 
     def __str__(self) -> str:
         return  f"1 - health potions: {self.health_potion}\n" \
@@ -62,8 +62,8 @@ class Inventory:
             out.append(f'Health Potion: {self.health_potion}')
         if self.bread_hunk > 0:
             out.append(f'Bread Hunk: {self.bread_hunk}')
-        if self.stength_potion > 0:
-            out.append(f'Strength Potion: {self.stength_potion}')
+        if self.strength_potion > 0:
+            out.append(f'Strength Potion: {self.strength_potion}')
         if self.agility_potion > 0:
             out.append(f'Agility Potion: {self.agility_potion}')
         if self.defence_potion > 0:
