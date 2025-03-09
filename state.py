@@ -220,6 +220,7 @@ class State:
                 self.stats['defence'] += 2;
             case InvItem.BREAD_HUNK:
                 self.stats['hp'] += 1;
+        return self.inventory.get_inventory()
                 
     def hp_dec(self,amt):
         self.hp -= amt

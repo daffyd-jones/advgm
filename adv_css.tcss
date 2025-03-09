@@ -1,26 +1,23 @@
 Center {
-    border: solid red;
+    # border: solid red;
     height: 100%;
 }
 
 .menu-btn {
-    border: solid yellow;
-    height: 25%;
+    # border: solid yellow;
+    height: 23%;
     width: 100%;
+    margin: 1;
 }
 
-# ListItem {
-#     height: 25%;
-# }
-
 #menu-screen {
-    border: solid orange;
+    # border: solid orange;
     align: center middle;
     # height: 100%;
 }
 
 #menu-list {
-    border: solid green;
+    # border: solid green;
     height: 60%;
     width: 40%;
 }
@@ -136,5 +133,24 @@ Tabs {
 	height: 100%;
 	# width: 100%;
 	# align: center middle;
+}
+
+#inv-md {
+    height: 20%;
+}
+
+.inv-btns {
+    width: 70%;
+    margin: 0 1 0 0;
+    
+}
+
+.inv-use-btns {
+    # margin: 0 0 0 1;
+    width: 10%;
+}
+
+#inv-horiz {
+    height: auto;
 }
 

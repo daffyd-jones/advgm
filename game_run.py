@@ -117,6 +117,14 @@ It could be an item that you take from a person, or a thing that is given to you
     """,
 ]
 
+item_map = {
+    "Health_Potion": InvItem.HEALTH_POTION,
+    "Strength_Potion": InvItem.STRENGTH_POTION,
+    "Agility_Potion": InvItem.AGILITY_POTION,
+    "Defence_Potion": InvItem.DEFENCE_POTION,
+    "Bread_Hunk": InvItem.BREAD_HUNK,
+}
+
 
  
 class AdventureGui(App):
@@ -195,8 +203,18 @@ class AdventureGui(App):
                 self.set_scene_content()
                 self.set_stats()
                 self.set_scene_imgs()
-  
-
+            case x if 'inv-btn' in x:
+                btn = event.button.label
+                item = f'{btn.split(":")[0]}'
+                info = self.state.inventory.get_info(item)
+                self.query_one('#inv-md').update(info)
+            case x if 'inv-use-btn' in x:
+                use_id = event.button.id
+                item = use_id.split("-")[3]
+                # self.query_one(Inventory).set_inventory(self.state.use_inv_item(item_map[item])) 
+                self.query_one(Inventory).set_inventory(['Health Potion: 6', 'Bread Hunk: 5', 'Strength Potion: 6', 'Agility Potion: 5']) 
+                
+                
 class GameScreen(Static):
 
     def __init__(self, inventory, id):
@@ -229,10 +247,13 @@ class GameScreen(Static):
                     yield Rule()
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     with ContentSwitcher(initial="inv-wig", id="tab-switch"):
-                        yield Inventory(self.inventory, id="inv-wig")
+                        yield Inventory(id="inv-wig")
                         # with Vertical(id="inv-vert"):
                         #     yield Ma("", id="tab-content")
                         yield Markdown("", id="tab-content")
+
+    def on_mount(self):
+        self.query_one(Inventory).inventory = self.inventory
 
     def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
         match f'{event.tab.label}':
@@ -257,18 +278,39 @@ class GameScreen(Static):
   
 class Inventory(Static):
 
-    def __init__(self, inventory, id):
-        self.inventory = inventory
-        super().__init__(id=id)
+    inventory = reactive([], recompose=True)
+    
+    # def __init__(self, inventory, id):
+    #     super().__init__(id=id)
+    #     self.inventory = inventory
 
     def on_mount(self):
-       inv_list =  self.query_one("#inv-vert")
-       for i, item in enumerate(self.inventory):
-           id_str = f'inv-btn-{i + 1}'
-           inv_list.append(ListItem(Button(item, id=id_str)))
+        inv_list =  self.query_one("#inv-vert")
+        for i, item in enumerate(self.inventory):
+            id_str = f'inv-btn-{i + 1}'
+            class_str = 'inv-btns'
+            label = item.split(":")[0].split(" ")
+            use_id_str = f'inv-use-btn-{label[0]}_{label[1]}'
+            use_class_str = 'inv-use-btns'
+            inv_list.append(ListItem(
+                    Horizontal(
+                        Button(item, id=id_str, classes=class_str),
+                        Button('USE', id=use_id_str, classes=use_class_str),
+                        id="inv-horiz"
+                    ),
+                )
+            )
 
     def compose(self):
+        yield Markdown(id="inv-md")
         yield ListView(id="inv-vert")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        pass
+
+    def set_inventory(self, inventory):
+        # self.inventory = inventory
+        self.mutate_reactive(Inventory.inventory)
             
 
 class MapRender(Static):

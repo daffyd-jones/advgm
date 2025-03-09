@@ -1,5 +1,44 @@
 from enums import InvItem
 
+
+item_info = {
+    'Health Potion': """
+**Health Potion**
+Provides a boost in health. It has a strong sour taste.
+
++ 20 health
+    """,
+    'Bread Hunk': """
+**Bread Hunk**
+Provides a small health benefit. It is quite stale.
+
++ 10 health
+    """,
+    'Strength Potion': """
+**Strength Potion**
+Provides an increase in strength, raising the damage you can cause.
+
++ 10 damage
+    """,
+    'Agility Potion': """
+**Agility Potion**
+Provides an increase in speed, making it easier to hit enemies.
+
++ 10 attack
+    """,
+    'Defence Potion': """
+**Defence Potion**
+Provides and increase in toughness, causing you to take less damage.
+
++ 10 defence
+    """,
+}
+
+
+
+
+
+
 #   - Inventory Class
 #
 #   used to manage inventory
@@ -83,3 +122,5 @@ class Inventory:
             case InvItem.BREAD_HUNK:
                 self.bread_hunk += 1;
         
+    def get_info(self, item):
+        return item_info[item]
