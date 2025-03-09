@@ -106,7 +106,7 @@ Markdown {
 	margin: 0 1;
 	padding: 1 1;
     background: $surface;
-	# height: 60%;
+	height: 40%;
 	# width: 100%;
 	align: center middle;
 }
