@@ -140,7 +140,6 @@ class AdventureGui(App):
             yield GameScreen(self.state.get_inventory(), id="game-screen")
             with Center(id="menu-screen"):
                 yield Vertical(
-                    # Markdown(id='mdbug'),
                     Button("New Game", id="menu-new", classes="menu-btn"),
                     Button("Load Game", id="menu-load", classes="menu-btn"),
                     Button("Save Game", id="menu-save", classes="menu-btn"),
@@ -213,8 +212,7 @@ class AdventureGui(App):
                 item = use_id.split("-")[3]
                 self.query_one(Inventory).set_inventory(self.state.use_inv_item(item_map[item])) 
                 self.set_stats()
-                # self.query_one(Inventory).set_inventory(['Health Potion: 6', 'Bread Hunk: 5', 'Strength Potion: 6', 'Agility Potion: 5']) 
-                
+              
                 
 class GameScreen(Static):
 
@@ -249,8 +247,6 @@ class GameScreen(Static):
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     with ContentSwitcher(initial="inv-wig", id="tab-switch"):
                         yield Inventory(id="inv-wig")
-                        # with Vertical(id="inv-vert"):
-                        #     yield Ma("", id="tab-content")
                         yield Markdown("", id="tab-content")
 
     def on_mount(self):
@@ -279,41 +275,20 @@ class GameScreen(Static):
   
 class Inventory(Static):
 
-    inventory = reactive([])#, recompose=True)
+    inventory = reactive([])
     
-    # def __init__(self, inventory, id):
-    #     super().__init__(id=id)
-    #     self.inventory = inventory
-
     def on_mount(self):
-        # inv_list =  self.query_one("#inv-vert")
-        # for i, item in enumerate(self.inventory):
-        #     id_str = f'inv-btn-{i + 1}'
-        #     class_str = 'inv-btns'
-        #     label = item.split(":")[0].split(" ")
-        #     use_id_str = f'inv-use-btn-{label[0]}_{label[1]}'
-        #     use_class_str = 'inv-use-btns'
-        #     inv_list.append(ListItem(
-        #             Horizontal(
-        #                 Button(item, id=id_str, classes=class_str),
-        #                 Button('USE', id=use_id_str, classes=use_class_str),
-        #                 id="inv-horiz"
-        #             ),
-        #         )
-        #     )
         pass
 
     def compose(self):
         yield Markdown(id="inv-md")
-        yield ListView(id="inv-vert")
+        yield ListView(id="inv-vert", initial_index=0)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         pass
 
     def set_inventory(self, inventory):
-        first = len(self.inventory) == 0
         self.inventory = inventory
-        # self.mutate_reactive(Inventory.inventory)
          
         inv_list =  self.query_one("#inv-vert")
         inv_list.clear()
@@ -331,12 +306,13 @@ class Inventory(Static):
                     ),
                 )
             )
-        #----
+        #----i
         
-        item = f'{btn.split(":")[0]}'
-        info = self.state.inventory.get_info(item)
-        self.query_one('#inv-md').update(info)
-            
+        inv_md = self.query_one('#inv-md')
+        if len(self.inventory) == 0:
+            inv_md.update('# no items')
+        elif inv_list.index == None:
+            inv_md.update('# select item')
 
 class MapRender(Static):
 
