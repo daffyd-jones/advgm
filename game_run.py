@@ -5,7 +5,7 @@ from state import State
 from rich_pixels import Pixels
 from textual.app import App, ComposeResult
 from textual.containers import Container, VerticalScroll, Horizontal, Vertical, Grid, Center
-from textual.widgets import Static, Footer, Header, Markdown, Rule, Button, Tabs, Tab, ListView, ListItem, ContentSwitcher
+from textual.widgets import Static, Footer, Header, Markdown, Rule, Button, Tabs, TabbedContent, ListView, ListItem, ContentSwitcher, TabPane
 
 aa = '''
 ;lksadjf;oio weoifhwoihekl ahekjh asd asd effef  fsd.
@@ -51,8 +51,8 @@ stats = """
 
 TABS = [
     "Inventory",
+    "Equipment",
     "Notes",
-    "Awards",
     "Experience",
 ]
 
@@ -247,6 +247,8 @@ class GameScreen(Static):
                     yield Tabs(TABS[0], TABS[1], TABS[2], TABS[3])
                     with ContentSwitcher(initial="inv-wig", id="tab-switch"):
                         yield Inventory(id="inv-wig")
+                        # yield Equiptment()
+                        yield Notes(id="notes-wig")
                         yield Markdown("", id="tab-content")
 
     def on_mount(self):
@@ -257,9 +259,9 @@ class GameScreen(Static):
             case 'Inventory':
                 self.query_one("#tab-switch").current = 'inv-wig'
             case 'Notes':
-                self.query_one("#tab-switch").current = 'tab-content'
-                tab_idx = TABS.index(f'{event.tab.label}')
-                self.query_one("#tab-content").update(TAB_CONT[tab_idx])
+                self.query_one("#tab-switch").current = 'notes-wig'
+                # tab_idx = TABS.index(f'{event.tab.label}')
+                # self.query_one("#tab-content").update(TAB_CONT[tab_idx])
             case 'Awards':
                 self.query_one("#tab-switch").current = 'tab-content'
                 tab_idx = TABS.index(f'{event.tab.label}')
@@ -268,7 +270,7 @@ class GameScreen(Static):
                 self.query_one("#tab-switch").current = 'tab-content'
                 tab_idx = TABS.index(f'{event.tab.label}')
                 self.query_one("#tab-content").update(TAB_CONT[tab_idx])
-                
+
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         pass
@@ -313,6 +315,79 @@ class Inventory(Static):
             inv_md.update('# no items')
         elif inv_list.index == None:
             inv_md.update('# select item')
+
+
+# class Equipment
+
+
+NOTE_TABS = [
+    "First Task",
+    "Second Task",
+    "Third Task",
+]
+
+NOTES = {
+    "First Task": """
+# Met a person 1
+
+You met a person who told you a thing.
+
+These are the main notes:
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+""",
+    "Second Task": """
+# Met a person 2
+
+You met a person who told you a thing.
+
+These are the main notes:
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+
+## This is a sub section
+
+This is a description of an event.
+
+These are more notes:
+- This is another note
+- This is another note
+- This is another note
+- This is another note
+- This is another note
+- This is another note
+
+More text
+""",
+    "Third Task": """
+# Met a person 3
+
+You met a person who told you a thing.
+
+These are the main notes:
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+- This is a point of note 
+""",
+}
+
+class Notes(Static):
+
+    def compose(self):
+        yield Tabs(NOTE_TABS[0], NOTE_TABS[1], NOTE_TABS[2])
+        yield Markdown(NOTES[NOTE_TABS[0]], id="notes-md")
+
+
+    def on_tabs_tab_activated(self, event: Tabs.TabActivated) -> None:
+        self.query_one("#notes-md").update(NOTES[f'{event.tab.label}'])
 
 class MapRender(Static):
 

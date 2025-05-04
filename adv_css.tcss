@@ -136,7 +136,7 @@ Tabs {
 }
 
 #inv-md {
-    height: 20%;
+    height: 18%;
 }
 
 .inv-btns {
@@ -152,5 +152,9 @@ Tabs {
 
 #inv-horiz {
     height: auto;
+}
+
+#notes-md {
+    # overflow-y: scroll;
 }
 
